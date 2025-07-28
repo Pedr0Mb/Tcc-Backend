@@ -1,0 +1,360 @@
+@host = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiY2FyZ28iOiJBZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzUzNTgyNTQ3LCJleHAiOjE3NTM1ODYxNDd9.PLuEEn4E9ja2YoLm7bVv-raGmNuQa4rQJt7K0NkMl1A
+
+### 1 . Criar usuário
+
+POST {{host}}/usuario
+Content-Type: application/json
+
+{
+"nome": "João Silva",
+"senha": "senha123",
+"cpf": "12345678901",
+"email": "joao@example.com",
+"nivel": "cidadao"
+}
+
+### 2. Fazer login (recebe token)
+
+POST {{host}}/usuario/login
+Content-Type: application/json
+
+{
+"cpf": "12345678601",
+"senha": "senha123"
+}
+
+### 3. Ver meu usuário
+
+GET {{host}}/usuario
+Authorization: Bearer {{token}}
+
+### 4. Listar usuários
+
+GET {{host}}/gestor
+Authorization: Bearer {{token}}
+
+### 5. Pesquisar usuário
+
+GET {{host}}/gestor/pesquisarUsuario?nmUsuario=João\&cpfUsuario=\&funcaoUsuario=
+Authorization: Bearer {{token}}
+
+### 6. Visualizar usuário
+
+GET {{host}}/gestor/visualizarUsuario/1
+Authorization: Bearer {{token}}
+
+### 7. Promover usuário
+
+PATCH {{host}}/gestor/promoverUsuario/1
+Authorization: Bearer {{token}}
+
+### 8. Listar notícias
+
+GET {{host}}/noticias
+Authorization: Bearer {{token}}
+
+### 9. Pesquisar notícias
+
+GET {{host}}/noticias/pesquisarNoticia?idGestor=4
+Authorization: Bearer {{token}}
+
+### 10. Visualizar notícia
+
+GET {{host}}/noticias/visualizarNoticia/1
+Authorization: Bearer {{token}}
+
+### 11. Criar notícia
+
+POST {{host}}/noticias
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"titulo": "Novo Evento",
+"corpo": "Detalhes do evento...",
+"link": "http://evento.com",
+"midia": "http://evento.com/imagem.jpg"
+}
+
+### 12. Alterar notícia
+
+PATCH {{host}}/noticias
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"titulo": "Evento Atualizado",
+"corpo": "Novos detalhes...",
+"link": "http://evento.com/atualizado",
+"midia": "http://evento.com/imagem2.jpg"
+}
+
+### 13. Deletar notícia (body)
+
+DELETE {{host}}/noticias
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"motivoRemocao": "Conteúdo obsoleto"
+}
+
+### 14. Listar transmissões
+
+GET {{host}}/transmissao
+Authorization: Bearer {{token}}
+
+### 15. Pesquisar transmissão
+
+GET {{host}}/transmissao/pesquisarTransmissao?titulo=2&idUsuario=4
+Authorization: Bearer {{token}}
+
+### 16. Visualizar transmissão
+
+GET {{host}}/transmissao/visualizarTransmissao/1
+Authorization: Bearer {{token}}
+
+### 17. Criar transmissão
+
+POST {{host}}/transmissao
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"titulo": "Live Sessão",
+"dataInicio": "2025-07-29",
+"descricao": "Participe ao vivo!",
+"link": "http://live.com/sessao"
+}
+
+### 18. Alterar transmissão
+
+PATCH {{host}}/transmissao
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"titulo": "Live Atualizada",
+"descricao": "Nova descrição",
+"link": "http://live.com/sessao2"
+}
+
+### 19. Deletar transmissão (body)
+
+DELETE {{host}}/transmissao
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"motivoRemocao": "Programa cancelado"
+}
+
+### 20. Listar pautas
+
+GET {{host}}/pauta
+Authorization: Bearer {{token}}
+
+### 21. Pesquisar pauta
+
+GET {{host}}/pauta/pesquisarPauta?id=4&titulo=Orçamento
+Authorization: Bearer {{token}}
+
+### 22. Visualizar pauta
+
+GET {{host}}/pauta/visualizarPauta/5
+Authorization: Bearer {{token}}
+
+### 23. Criar pauta
+
+POST {{host}}/pauta
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"titulo": "Orçamento Público",
+"descricao": "Discussão do orçamento",
+"justificativa": "Importante para a cidade"
+}
+
+### 24. Alterar pauta
+
+PATCH {{host}}/pauta
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 3,
+"titulo": "Orçamento Atualizado",
+"descricao": "Novos detalhes",
+"justificativa": "Revisão necessária",
+"status": "Restrita"
+}
+
+### 25. Deletar pauta (body)
+
+DELETE {{host}}/pauta
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 3,
+"motivoRemocao": "Informação incorreta"
+}
+
+### 26. Listar comentários
+
+GET {{host}}/comentario?idPauta=5
+Authorization: Bearer {{token}}
+
+### 27. Pesquisar comentário
+
+GET {{host}}/comentario/pesquisarComentario?id=1\&idPauta=1
+Authorization: Bearer {{token}}
+
+### 28. Criar comentário
+
+POST {{host}}/comentario
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"texto": "Bruh Bruh Patapim!",
+"idPauta": 6
+}
+
+### 29. Alterar comentário
+
+PATCH {{host}}/comentario
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 3,
+"texto": "Ponto atualizado"
+}
+
+### 30. Deletar comentário (body)
+
+DELETE {{host}}/comentario
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 3,
+"motivoRemocao": "Comentário ofensivo"
+}
+
+### 31. Listar votações
+
+GET {{host}}/votacao
+Authorization: Bearer {{token}}
+
+### 32. Pesquisar votações
+
+GET {{host}}/votacao/pesquisarVotacao?tituloVotacao=Consulta\&statusVotacao=Aberta\&idVotacao=
+Authorization: Bearer {{token}}
+
+### 33. Visualizar votação
+
+GET {{host}}/votacao/visualizarVotacao/1
+Authorization: Bearer {{token}}
+
+### 34. Criar votação
+
+POST {{host}}/votacao
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"titulo": "Nova Consulta",
+"descricao": "Descrição da votação",
+"dataInicio": "2025-07-20T10:00:00",
+"dataFim": "2025-07-25T18:00:00",
+"status": "Aberta",
+"resultado": ""
+}
+
+### 35. Alterar votação
+
+PATCH {{host}}/votacao
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"titulo": "Consulta Atualizada",
+"descricao": "Descrição revisada",
+"dataInicio": "2025-07-21T09:00:00",
+"dataFim": "2025-07-26T17:00:00",
+"status": "Encerrada",
+"resultado": "Aprovada"
+}
+
+### 36. Deletar votação (body)
+
+DELETE {{host}}/votacao
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"motivoRemocao": "Votação encerrada erroneamente"
+}
+
+### 37. Listar propostas
+
+GET {{host}}/proposta?idVotacao=2
+Authorization: Bearer {{token}}
+
+### 38. Pesquisar propostas
+
+GET {{host}}/proposta/pesquisarProposta?tituloProposta=Proposta\&idVotacao=2
+Authorization: Bearer {{token}}
+
+### 39. Visualizar proposta
+
+GET {{host}}/proposta/visualizarProposta/2
+Authorization: Bearer {{token}}
+
+### 40. Criar proposta
+
+POST {{host}}/proposta
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"titulo": "Proposta do mal",
+"descricao": "Descrição da proposta",
+"criador": "Usuário X",
+"idVotacao": 1
+}
+
+### 41. Alterar proposta
+
+PATCH {{host}}/proposta
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 2,
+"titulo": "Proposta Revisada",
+"descricao": "Novos detalhes",
+"criador": "Usuário X",
+"qtVotos": 10
+}
+
+### 42. Deletar proposta (body)
+
+DELETE {{host}}/proposta
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+"id": 1,
+"motivoRemocao": "Proposta duplicada"
+}
