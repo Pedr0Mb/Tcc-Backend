@@ -3,7 +3,13 @@ import { registrarAtividade } from '../utils/registroAtividade.js'
 
 export async function ListarNoticia(req,res) {
     try {
-    const [noticias] = await db.query('SELECT titulo_noticia, dataPublicacao_noticia, corpo_noticia, link_noticia  FROM Noticia')
+    const [noticias] = await db.query(`
+     SELECT id_noticia,
+     titulo_noticia, 
+     dataPublicacao_noticia, 
+     midia_noticia  
+     FROM Noticia`
+     )
     return res.status(200).json(noticias)
 
   } catch (erro) {
@@ -13,10 +19,10 @@ export async function ListarNoticia(req,res) {
 }
 
 export async function PesquisarNoticia(req,res) {
-  const {titulo ,dataInicio, idGestor} = req.query
+  const {titulo, idGestor} = req.query
 
   try{
-    const [resultado] = await db.query('CALL pesquisarNoticias(?,?,?)', [titulo,dataInicio,idGestor])
+    const [resultado] = await db.query('CALL pesquisarNoticias(?,?)', [titulo,idGestor])
    
     const noticias = resultado[0] || [];
 

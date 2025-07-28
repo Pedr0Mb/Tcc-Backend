@@ -6,12 +6,9 @@ export async function ListarPauta(req,res) {
     const [pautas] = await db.query(`
       SELECT id_pauta,
       titulo_pauta,
-      descricao_pauta,
-      dataPublicacao_pauta,
-      status_pauta
+      dataPublicacao_pauta
       FROM Pauta`
     )
-
     return res.status(200).json(pautas)
 
   } catch (erro) {
@@ -73,11 +70,8 @@ export async function CriarPauta(req,res) {
           id_usuario ) 
           VALUES (?, ?, ?, NOW(), 'Ativa', ?)`,
           [titulo, descricao, justificativa, idUsuario]
-        );
-
-        
+        )
         await registrarAtividade('pauta_criada', 'Pauta criada', null, idUsuario)
-        
         return res.status(201).json({ message: 'Pauta criada com sucesso'})
 
     }catch(erro){
@@ -113,7 +107,6 @@ export async function AlterarPauta(req,res) {
         )
         
         await registrarAtividade('pauta_alterada', 'Pauta alterada', null, idUsuario)
-
         return res.status(200).json({ message: 'Pauta atualizada com sucesso'})
 
     }catch(erro){
@@ -128,7 +121,10 @@ export async function DeletarPauta(req,res) {
 
     const [criadorPauta] = await db.query(`
       SELECT id_usuario 
-      FROM Pauta WHERE id_pauta = ? AND id_usuario = ?`, [id, idUsuario])
+      FROM Pauta WHERE id_pauta = ? 
+      AND id_usuario = ?`, 
+      [id, idUsuario]
+      )
 
     if(criadorPauta.length === 0 && req.usuario.cargo == 'cidadao') return res.status(500).json({ message: 'Você não pode alterar essa pauta'})
 

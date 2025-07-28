@@ -5,7 +5,7 @@ import { autenticarToken } from '../middlewares/autenticarToken.js';
 const router = express.Router();
 
 router.get('/', comentarioController.ListarComentario);
-router.get('/pesquisarComentario', comentarioController.PesquisarComentario)
+router.get('/pesquisarComentario', comentarioController.VisualizarComentario)
 
 router.post('/', autenticarToken, comentarioController.CriarComentario)
 

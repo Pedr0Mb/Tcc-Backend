@@ -6,12 +6,9 @@ export async function ListarTransmissoes(req,res) {
     const [transmissoes] = await db.query(
       `SELECT id_transmissao,
       titulo_transmissao, 
-      dataPublicacao_transmissao, 
-      descricao_transmissao, 
-      link_transmissao 
+      dataPublicacao_transmissao
       FROM Transmissao`
     )
-    
     return res.status(200).json(transmissoes)
 
   } catch (erro) {

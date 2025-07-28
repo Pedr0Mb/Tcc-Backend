@@ -5,7 +5,10 @@ export async function ListarComentario(req,res) {
   const { idPauta } = req.query
     try {
     const [comentarios] = await db.query(`
-      SELECT * 
+      SELECT id_comentario, 
+      texto_comentario, 
+      dataPublicacao_comentario,
+      id_usuario
       FROM Comentario 
       WHERE id_pauta = ?`
     ,[idPauta])
@@ -17,11 +20,11 @@ export async function ListarComentario(req,res) {
   }
 }
 
-export async function PesquisarComentario(req,res) {
+export async function VisualizarComentario(req,res) {
   const {id,idPauta} = req.query
 
   try{
-    const [resultado] = await db.query('CALL pesquisarComentarios(?,?)', [id,idPauta])
+    const [resultado] = await db.query('CALL visualizarComentario(?,?)', [id,idPauta])
    
     const comentarios = resultado[0] || [];
 

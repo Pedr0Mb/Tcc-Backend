@@ -6,7 +6,8 @@ export async function ListarProposta(req,res) {
 
     try{
         const [proposta] = await db.query(
-          `SELECT titulo_proposta, 
+          `SELECT id_proposta,
+          titulo_proposta, 
           descricao_proposta, 
           criador_proposta, 
           qtVotos_proposta 

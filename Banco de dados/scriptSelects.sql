@@ -28,7 +28,7 @@ DROP PROCEDURE IF EXISTS pesquisarVotacoes;
 DELIMITER //
 CREATE PROCEDURE pesquisarVotacoes(IN tituloVotacao VARCHAR(100), IN statusVotacao VARCHAR(30), IN idVotacao INT)
 BEGIN
-    SELECT titulo_votacao, dataInicio_votacao, dataFim_votacao, status_votacao, resultado_votacao FROM Votacao
+    SELECT id_votacao, titulo_votacao, dataInicio_votacao, dataFim_votacao, status_votacao, resultado_votacao FROM Votacao
     WHERE (statusVotacao IS NULL OR status_votacao = statusVotacao)
       AND (idVotacao IS NULL OR id_votacao = idVotacao)
       AND (tituloVotacao IS NULL OR titulo_votacao LIKE CONCAT('%',tituloVotacao,'%'))
@@ -64,7 +64,11 @@ DROP PROCEDURE IF EXISTS pesquisarPropostas;
 DELIMITER //
 CREATE PROCEDURE pesquisarPropostas(IN tituloProposta VARCHAR(100), IN idVotacao INT)
 BEGIN
-    SELECT * FROM Proposta 
+    SELECT  id_proposta,
+          titulo_proposta, 
+          descricao_proposta, 
+          criador_proposta, 
+          qtVotos_proposta  FROM Proposta 
     WHERE (idVotacao IS NULL OR id_votacao = idVotacao)
     AND (tituloProposta IS NULL OR titulo_proposta LIKE CONCAT('%',tituloProposta,'%'))
     ORDER BY qtVotos_proposta DESC;
@@ -75,12 +79,10 @@ DELIMITER ;
 
 DROP PROCEDURE IF EXISTS pesquisarNoticias;
 DELIMITER //
-CREATE PROCEDURE pesquisarNoticias(IN titulo VARCHAR(100), IN data_inicio DATETIME, IN id_gestor INT)
+CREATE PROCEDURE pesquisarNoticias(IN titulo VARCHAR(100), IN id_gestor INT)
 BEGIN
-    SELECT titulo_noticia, dataPublicacao_noticia, midia_noticia FROM Noticia
+    SELECT id_noticia, titulo_noticia, dataPublicacao_noticia, midia_noticia FROM Noticia
     WHERE (titulo IS NULL OR titulo_noticia LIKE CONCAT('%', titulo, '%'))
-      AND (data_inicio IS NULL OR dataPublicacao_noticia >= data_inicio)
-      AND dataPublicacao_noticia <= NOW()
       AND (id_gestor IS NULL OR id_usuario = id_gestor)
     ORDER BY dataPublicacao_noticia DESC;
 END //
@@ -101,7 +103,7 @@ DROP PROCEDURE IF EXISTS pesquisarTransmissao;
 DELIMITER //
 CREATE PROCEDURE pesquisarTransmissao(IN titulo VARCHAR(100), IN idusuario INT)
 BEGIN
-    SELECT titulo_transmissao, dataPublicacao_transmissao, descricao_transmissao FROM Transmissao
+    SELECT id_transmissao, titulo_transmissao, dataPublicacao_transmissao FROM Transmissao
     WHERE (titulo IS NULL OR titulo_transmissao LIKE CONCAT('%', titulo, '%'))
       AND (idusuario IS NULL OR idusuario = id_usuario)
     ORDER BY dataPublicacao_transmissao DESC;
@@ -146,7 +148,7 @@ DROP PROCEDURE IF EXISTS pesquisarPautas;
 DELIMITER //
 CREATE PROCEDURE pesquisarPautas(IN idUsuario INT, IN tituloPauta VARCHAR(100))
 BEGIN
-    SELECT titulo_pauta, dataPublicacao_pauta, status_pauta FROM Pauta 
+    SELECT id_pauta, titulo_pauta, dataPublicacao_pauta, id_usuario FROM Pauta 
     WHERE (idUsuario IS NULL OR id_usuario = idUsuario)
       AND (tituloPauta IS NULL OR titulo_pauta LIKE CONCAT('%',tituloPauta,'%'))
     ORDER BY dataPublicacao_pauta DESC;
@@ -181,16 +183,14 @@ DELIMITER ;
 /*Cometários*/
 
 -- Procedure para pesquisar comentários
-DROP PROCEDURE IF EXISTS pesquisarComentarios;
+DROP PROCEDURE IF EXISTS visualizarComentario;
 DELIMITER //
-CREATE PROCEDURE pesquisarComentarios( IN p_idUsuario INT, IN p_idPauta INT)
+CREATE PROCEDURE visualizarComentario( IN idComentario INT)
 BEGIN
   SELECT 
     id_comentario, texto_comentario, dataPublicacao_comentario, id_usuario, id_pauta
   FROM Comentario
-  WHERE (p_idUsuario IS NULL OR id_usuario = p_idUsuario)
-    AND (p_idPauta  IS NULL OR id_pauta   = p_idPauta)
-  ORDER BY dataPublicacao_comentario DESC;
+  WHERE (idComentario IS NULL OR id_comentario = idComentario);
 END //
 DELIMITER ;
 
