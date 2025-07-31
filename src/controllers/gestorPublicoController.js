@@ -1,16 +1,5 @@
 import { db } from '../plugins/bd.js'
 
-export async function ListarUsuarios(req,res) {
-    try {
-    const [usuarios] = await db.query('SELECT * FROM Usuario')
-    return res.status(200).json(usuarios)
-
-  } catch (erro) {
-    console.error('Erro ao listar usuários:', erro)
-    res.status(500).json({ error: 'Erro interno ao listar usuários'})
-  }
-}
-
 export async function PesquisarUsuario(req,res) {
   const {nomeUsuario ,cpfUsuario, cargoUsuario} = req.query
 
@@ -46,10 +35,10 @@ export async function VisualizarUsuario(req,res) {
 }
 
 export async function PromoverUsuario(req,res) {
-  const idUsuario = req.params.id
+  const cpf = req.params.id
 
   try{
-    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',idUsuario])
+    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',cpf])
   
     return res.status(200).json({ message: 'Usuario promovido para Gestor Público'})
 

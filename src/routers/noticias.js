@@ -5,7 +5,6 @@ import { verificarPermissao } from '../middlewares/verificarPermissao.js';
 
 const router = express.Router();
 
-router.get('/', noticiaController.ListarNoticia);
 router.get('/pesquisarNoticia', noticiaController.PesquisarNoticia)
 router.get('/visualizarNoticia/:id', noticiaController.VisualizarNoticia)
 

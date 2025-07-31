@@ -1,17 +1,12 @@
 import { z } from 'zod'
 
 const mensagens = {
-  campo: "Campo obrigatório",
-  dado: "Dado inválido"
+  campo: "Campo obrigatório"
 }
 
 const idSchema = z.number({ required_error: mensagens.campo })
   .int({ message: mensagens.dado })
   .positive({ message: 'Id deve ter valor positivo' })
-
-export const valListarComentario = z.object({
-  idPauta: idSchema
-})
 
 export const valvisualizarComentario = z.object({
   idComentario: idSchema
@@ -36,9 +31,7 @@ export const valAlterarComentario = z.object({
 export const valDeletarComentario = z.object({
   motivoRemocao: z
     .string({ required_error: mensagens.campo })
-    .max(256, { message: 'Motivo Remoção deve conter no máximo 256 caractéres' })
-    .nullable()
-    .optional(),
+    .max(256, { message: 'Motivo Remoção deve conter no máximo 256 caractéres' }),
 
   idComentario: idSchema
 })

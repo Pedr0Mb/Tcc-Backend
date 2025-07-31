@@ -1,27 +1,11 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 
-export async function ListarTransmissoes(req,res) {
-    try {
-    const [transmissoes] = await db.query(
-      `SELECT id_transmissao,
-      titulo_transmissao, 
-      dataInicio_transmissao
-      FROM Transmissao`
-    )
-    return res.status(200).json(transmissoes)
-
-  } catch (erro) {
-    console.error('Erro ao listar as notícias:', erro)
-    res.status(500).json({ error: 'Erro interno ao listar notícias'})
-  }
-}
-
 export async function PesquisarTransmissao(req,res) {
-  const {titulo ,idUsuario} = req.query
+  const {titulo ,status} = req.query
 
   try{
-    const [resultado] = await db.query('CALL pesquisarTransmissao(?,?)', [titulo,idUsuario])
+    const [resultado] = await db.query('CALL pesquisarTransmissao(?,?)', [titulo,status])
 
     const transmissoes = resultado[0] || [];
 

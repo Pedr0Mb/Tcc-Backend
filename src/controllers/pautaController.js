@@ -1,27 +1,11 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 
-export async function ListarPauta(req,res) {
-    try {
-    const [pautas] = await db.query(`
-      SELECT id_pauta,
-      titulo_pauta,
-      dataPublicacao_pauta
-      FROM Pauta`
-    )
-    return res.status(200).json(pautas)
-
-  } catch (erro) {
-    console.error('Erro ao listar as pautas:', erro)
-    return res.status(500).json({ error: 'Erro interno ao listar as pautas'})
-  }
-}
-
 export async function PesquisarPauta(req,res) {
-  const {id ,titulo} = req.query
+  const {titulo ,status} = req.query
 
   try{
-    const [resultado] = await db.query('CALL pesquisarPautas(?,?)', [id,titulo])
+    const [resultado] = await db.query('CALL pesquisarPautas(?,?)', [titulo,status])
    
     const pautas = resultado[0] || [];
 
@@ -54,10 +38,8 @@ export async function VisualizarPauta(req, res) {
 
 
 export async function CriarPauta(req,res) {
-    const {titulo, descricao, justificativa } = req.body
+    const {titulo, descricao, justificativa, dataLimite, anexos } = req.body
     const idUsuario = req.usuario.id
-
-    if(!titulo || !descricao || !justificativa) return res.status(400).json({ message: 'Preencha todos os campos'})
 
     try{
         await db.query(
@@ -66,10 +48,12 @@ export async function CriarPauta(req,res) {
           descricao_pauta,
           justificativa_pauta,
           dataPublicacao_pauta,
+          dataLimite_pauta,
+          anexos_pauta,
           status_pauta,
           id_usuario ) 
-          VALUES (?, ?, ?, NOW(), 'Ativa', ?)`,
-          [titulo, descricao, justificativa, idUsuario]
+          VALUES (?, ?, ?, NOW(), ?, ?, 'Ativa', ?)`,
+          [titulo, descricao, justificativa, dataLimite, anexos, idUsuario]
         )
         await registrarAtividade('pauta_criada', 'Pauta criada', null, idUsuario)
         return res.status(201).json({ message: 'Pauta criada com sucesso'})
@@ -81,16 +65,14 @@ export async function CriarPauta(req,res) {
 }
 
 export async function AlterarPauta(req,res) {
-    const {id, titulo, descricao, justificativa, status } = req.body
+    const {idPauta, titulo, descricao, justificativa, dataLimite, anexos, status } = req.body
     const idUsuario = req.usuario.id
-
-    if(!id || !titulo || !descricao || !justificativa || !status) return res.status(400).json({ message: 'Preencha todos os campos'})
 
     const [criadorPauta] = await db.query(
       `SELECT id_usuario 
       FROM Pauta
       WHERE id_pauta = ? AND id_usuario = ?`, 
-      [id, idUsuario]
+      [idPauta, idUsuario]
     )
 
     if(criadorPauta.length === 0 && req.usuario.cargo == 'cidadao') return res.status(500).json({ message: 'Você não pode alterar essa pauta'})
@@ -98,12 +80,14 @@ export async function AlterarPauta(req,res) {
     try{
         await db.query(
           `UPDATE Pauta 
-          SET titulo_pauta = ?, 
-          descricao_pauta = ?, 
-          justificativa_pauta = ?, 
-          status_pauta = ?
+          titulo_pauta = ?,
+          descricao_pauta = ?,
+          justificativa_pauta = ?,
+          dataLimite_pauta = ?,
+          anexos_pauta = ?,
+          status_pauta ?,
           WHERE id_pauta = ?`, 
-          [titulo, descricao, justificativa, status, id]
+          [titulo, descricao, justificativa, dataLimite, anexos, status, idPauta]
         )
         
         await registrarAtividade('pauta_alterada', 'Pauta alterada', null, idUsuario)

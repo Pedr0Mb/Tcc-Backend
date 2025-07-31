@@ -1,28 +1,11 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 
-export async function ListarNoticia(req,res) {
-    try {
-    const [noticias] = await db.query(`
-     SELECT id_noticia,
-     titulo_noticia, 
-     dataPublicacao_noticia, 
-     midia_noticia  
-     FROM Noticia`
-     )
-    return res.status(200).json(noticias)
-
-  } catch (erro) {
-    console.error('Erro ao listar as notícias:', erro)
-    res.status(500).json({ error: 'Erro interno ao listar notícias'})
-  }
-}
-
 export async function PesquisarNoticia(req,res) {
-  const {titulo, idGestor} = req.query
+  const {titulo, tema, status} = req.query
 
   try{
-    const [resultado] = await db.query('CALL pesquisarNoticias(?,?)', [titulo,idGestor])
+    const [resultado] = await db.query('CALL pesquisarNoticias(?,?,?)', [titulo,tema,status])
    
     const noticias = resultado[0] || [];
 
@@ -53,22 +36,23 @@ export async function VisualizarNoticia(req,res) {
 }
 
 export async function CriarNoticia(req,res) {
-  const {titulo, corpo, link, midia} = req.body
+  const {titulo,tema,dataLimite, breveDescritivo, link, midia} = req.body
   const idGestor = req.usuario.id
-    
-  if(!titulo || !corpo || !link) return res.status(400).json({ message: 'Preencha todos os campos'})
       
   try{
    await db.query(
       `INSERT INTO Noticia (
       titulo_noticia,
+      tema_noticia,
       dataPublicacao_noticia,
-      corpo_noticia,
+      dataLimite_noticia,
+      status_noticia,
+      breveDescritivo_noticia,
       link_noticia,
       midia_noticia,
       id_usuario ) 
-      VALUES (?, NOW(), ?, ?, ?, ?)`,
-      [titulo, corpo, link, midia, idGestor]
+      VALUES (?,?, NOW(), ?, 'Ativa', ?, ?, ?, ?)`,
+      [titulo, tema, dataLimite, breveDescritivo, link, midia, idGestor]
   );
     
     await registrarAtividade('noticia_criada','Noticia criada',null,idGestor)
@@ -82,13 +66,22 @@ export async function CriarNoticia(req,res) {
 }
     
 export async function AlterarNoticia(req,res) {
-  const {id,titulo, corpo, link, midia} = req.body
+  const {titulo,tema,dataLimite, status, breveDescritivo, link, midia} = req.body
   const idGestor = req.usuario.id
-      
-  if(!id ||!titulo || !corpo || !link) return res.status(400).json({ message: 'Preencha todos os campos'})
+  
         
   try{
-    await db.query('UPDATE Noticia SET titulo_noticia = ?, corpo_noticia = ?, link_noticia = ?, midia_noticia = ? WHERE id_noticia = ?', [titulo,corpo,link,midia,id])
+    await db.query(`UPDATE Noticia 
+      SET titulo_noticia = ?, 
+      tema_noticia = ?,
+      dataLimite_noticia = ?,
+      status_noticia = ?,
+      breveDescritivo_noticia = ?,
+      link_noticia = ?,
+      midia_noticia = ?
+      WHERE id_noticia = ?`
+      , [titulo, tema, dataLimite, status, breveDescritivo, link, midia, idGestor]
+    )
           
     await registrarAtividade('noticia_alterada','Noticia alterada',null,idGestor)
           

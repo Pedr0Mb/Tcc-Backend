@@ -4,7 +4,6 @@ import { autenticarToken } from '../middlewares/autenticarToken.js';
 
 const router = express.Router();
 
-router.get('/', pautaController.ListarPauta);
 router.get('/pesquisarPauta', pautaController.PesquisarPauta)
 router.get('/visualizarPauta/:id', pautaController.VisualizarPauta)
 

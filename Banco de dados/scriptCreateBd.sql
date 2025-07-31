@@ -17,19 +17,18 @@ CREATE TABLE Usuario (
 
 CREATE TABLE Permissao (
   id_permissao INT NOT NULL AUTO_INCREMENT,
-  nome_permissao ENUM('criar', 'editar', 'excluir', 'visualizar') NOT NULL,
-  PRIMARY KEY (id_permissao),
-  UNIQUE (nome_permissao)
+  nome_permissao ENUM('Publicar Noticia', 'Agendar Transmissao', 'Criar Votacao', 'Moderar Conteudo') NOT NULL,
+  PRIMARY KEY (id_permissao)
 );
 
-CREATE TABLE Permissao (
-  id_permissao INT NOT NULL AUTO_INCREMENT,
-  nome_permissao ENUM('Criar Votacao', 'Publicar Noticia', 'excluir', 'visualizar') NOT NULL,
+CREATE TABLE PermissaoUsuario (
+  id_permissaoUsuario INT NOT NULL AUTO_INCREMENT,
+  id_permissao INT NOT NULL,
+  id_usuario INT NOT NULL,
   PRIMARY KEY (id_permissao),
-  UNIQUE (nome_permissao)
+  FOREIGN KEY (id_permissao) REFERENCES Permissao(id_permissao),
+  FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
-
-INSERT INTO Usuario VALUES (null, 'adm', 'adm@gmail', '$2b$10$EnUaPQve1AoLkdMUwja2aubsEp/47g3y0uhX1Tkgi8VNgA0gx5Jq6', 'cidadao', '12345678601', "Administrador");
 
 DROP TABLE IF EXISTS Votacao;
 CREATE TABLE Votacao (
@@ -76,7 +75,7 @@ DROP TABLE IF EXISTS ResgistroAtividade;
 CREATE TABLE RegistroAtividade (
   id_registroAtividade INT NOT NULL AUTO_INCREMENT,
   tipo_atividade VARCHAR(50) NOT NULL,
-  descricao_atividade TEXT,
+  descricao_atividade VARCHAR(256),
   link_atividade TEXT,
   date_atividade DATETIME NOT NULL,
   id_usuario INT NOT NULL,
@@ -91,6 +90,7 @@ CREATE TABLE Noticia (
   tema_noticia ENUM('Educação','Segurança','Cultura','Saúde') NOT NULL,
   dataPublicacao_noticia DATETIME NOT NULL,
   dataLimite_noticia DATETIME NOT NULL,
+  status_noticia ENUM('Ativo','Inativo') NOT NULL,
   breveDescritivo_noticia VARCHAR(256) NOT NULL,
   link_noticia TEXT NOT NULL,
   midia_noticia TEXT,
@@ -104,7 +104,7 @@ CREATE TABLE Transmissao (
   id_transmissao INT NOT NULL AUTO_INCREMENT,
   titulo_transmissao VARCHAR(50) NOT NULL,
   subTitulo_transmissao VARCHAR(50) NOT NULL,
-  status_transmissao VARCHAR(30) NOT NULL,
+  status_transmissao ENUM('Agendada','Ao Vivo','Encerrada') NOT NULL,
   dataPublicacao_transmissao DATETIME NOT NULL,
   dataInicio_transmissao DATETIME NOT NULL,
   breveDescritivo_transmissao VARCHAR(256) NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE Pauta (
   dataPublicacao_pauta DATETIME NOT NULL,
   dataLimite_pauta DATETIME NOT NULL,
   anexos_pauta TEXT,
-  status_pauta VARCHAR(25) NOT NULL,
+  status_pauta ENUM('Ativo','Inativo') NOT NULL,
   id_usuario INT NOT NULL,
   PRIMARY KEY (id_pauta),
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
@@ -133,7 +133,7 @@ CREATE TABLE Pauta (
 DROP TABLE IF EXISTS Comentario;
 CREATE TABLE Comentario (
   id_comentario INT NOT NULL AUTO_INCREMENT,
-  texto_comentario TEXT NOT NULL,
+  texto_comentario VARCHAR(256) NOT NULL,
   dataPublicacao_comentario DATETIME NOT NULL,
   id_usuario INT NOT NULL,
   id_pauta INT NOT NULL,

@@ -1,31 +1,11 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 
-export async function ListarVotacoes(req,res) {
-    try{
-        const [votacoes] = await db.query(
-          `SELECT id_votacao,
-          titulo_votacao, 
-          descricao_votacao, 
-          dataInicio_votacao, 
-          dataFim_votacao, 
-          status_votacao, 
-          resultado_votacao 
-          FROM Votacao`
-        )
-
-        return res.status(200).json(votacoes)
-    }catch(erro){
-        console.error('Erro ao listar as votações:', erro)
-        res.status(500).json({ error: 'Erro interno ao listar votações'})
-    }
-}
-
 export async function PesquisarVotacoes(req,res) {
-  const {titulo ,status, idVotacao} = req.query
+  const {titulo ,status, tema} = req.query
 
   try{
-    const [resultado] = await db.query('CALL pesquisarVotacoes(?,?,?)', [titulo,status,idVotacao])
+    const [resultado] = await db.query('CALL pesquisarVotacoes(?,?,?)', [status, titulo,tema])
    
     const votacoes = resultado[0] || [];
 
@@ -45,7 +25,7 @@ export async function VisualizarVotacao(req, res) {
   try {
     const [resultado] = await db.query('CALL visualizarVotacao(?)', [id]);
 
-    const votacao = resultado[0][0] || {};     
+    const votacao = resultado[0] || {};     
     const propostas = resultado[1] || [];     
 
     return res.status(200).json({votacao,propostas});
@@ -58,25 +38,39 @@ export async function VisualizarVotacao(req, res) {
 
 
 export async function CriarVotacao(req,res) {
-  const {titulo, descricao, dataInicio, dataFim, status, resultado} = req.body
+  const {titulo, tema, breveDescritivo,publicoAlvo,orcamento, dataFim, anexos, resultado, opcoesResposta} = req.body
   const idGestor = req.usuario.id
-    
-  if(!titulo || !descricao || !dataInicio || !dataFim || !status) return res.status(400).json({ message: 'Preencha todos os campos'})
       
   try{
-    await db.query(
+   const [resultadoVotacao] = await db.execute(
       `INSERT INTO Votacao (
       titulo_votacao,
-      descricao_votacao,
-      dataInicio_votacao,
+      tema_votacao,
+      breveDescritivo_votacao,
+      publicoAlvo_votacao,
+      orçamento_votacao,
+      dataPublicação_votacao,
       dataFim_votacao,
       status_votacao,
+      anexos_votacao,
       resultado_votacao,
       id_usuario )
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [titulo, descricao, dataInicio, dataFim, status, resultado, idGestor]
+      VALUES (?, ?, ?, ?, ?, 'NOW()', ?, 'Ativa', ?, ?, ?)`,
+      [titulo,tema, breveDescritivo,publicoAlvo,orcamento, dataFim, anexos, resultado, idGestor]
     )
+
+    const idVotacao = resultadoVotacao.id_votacao
      
+     for (const opcoes of opcoesResposta) {
+      await db.query(`
+        INSERT INTO OpcoesResposta (
+        titulo_opcaoResposta, 
+        id_votacao,
+        id_usuario)
+        VALUES (?,?,?)
+      `,[opcoes,idVotacao,idGestor])
+     }
+
     await registrarAtividade('votacao_criada','Votação criada',null,idGestor)
         
     return res.status(201).json({ message: 'Votação criada com sucesso'})
@@ -88,22 +82,23 @@ export async function CriarVotacao(req,res) {
 }
     
 export async function AlterarVotacao(req,res) {
-  const {id,titulo, descricao, dataInicio, dataFim, status, resultado} = req.body
+  const {idVotacao, titulo, tema, breveDescritivo,publicoAlvo,orcamento, dataFim, status, anexos, resultado} = req.body
   const idGestor = req.usuario.id
-      
-  if(!id ||!titulo || !descricao || !dataInicio || !dataFim || !status || !resultado) return res.status(400).json({ message: 'Preencha todos os campos'})
         
   try{
     await db.query(
       `UPDATE Votacao 
       SET titulo_votacao = ?, 
-      descricao_votacao = ?, 
-      dataInicio_votacao = ?, 
-      dataFim_votacao = ?, 
-      status_votacao = ?, 
-      resultado_votacao = ? 
+      tema_votacao = ?,
+      breveDescritivo_votacao = ?,
+      publicoAlvo_votacao = ?
+      orçamento_votacao = ?,
+      dataFim_votacao = ?,
+      status_votacao = ?,
+      anexos_votacao = ?,
+      resultado_votacao = ?,
       WHERE id_votacao = ?`, 
-      [titulo,descricao,dataInicio,dataFim,status,resultado,id]
+      [titulo,tema, breveDescritivo,publicoAlvo,orcamento, dataFim, status, anexos, resultado, idVotacao]
     )
           
     await registrarAtividade('votacao_alterada','Votação alterada',null,idGestor)

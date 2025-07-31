@@ -23,8 +23,6 @@ export async function CriarComentario(req,res) {
     const {texto, idPauta } = req.body
     const idUsuario = req.usuario.id
 
-    if(!texto || !idPauta ) return res.status(400).json({ message: 'Preencha todos os campos'})
-
     try{
       await db.query(
         `INSERT INTO Comentario (

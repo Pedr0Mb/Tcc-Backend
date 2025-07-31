@@ -7,25 +7,25 @@ const mensagens = {
 
 const idSchema = z.number({ required_error: mensagens.campo })
   .int({ message: mensagens.dado })
-  .positive({ message: mensagens.dado })
+  .positive({ message: 'Id deve ter valor positivo' })
 
 export const valPesquisarUsuario = z.object({
     nomeUsuario: z
     .string({ required_error: mensagens.campo })
-    .max(150, { message: mensagens.dado })
+    .max(150, { message:'Nome deve conter no máximo 150 caractéres' })
     .nullable()
     .optional(),
 
      cpfUsuario: z
     .string({ required_error: mensagens.campo })
-    .length(11, { message: mensagens.dado })
+    .length(11, { message: "CPF deve conter 11 digitos" })
     .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" })
     .nullable()
     .optional(),
 
     cargoUsuario: z
     .string({ required_error: mensagens.campo })
-    .max(25, { message: mensagens.dado })
+    .enum(['Administrador','Gestor','cidadao'], {message: "Opção de Cargo Invalido"})
     .nullable()
     .optional()
 })
@@ -35,6 +35,9 @@ export const valVisualizarUsuario = z.object({
 })
 
 export const valPromoverUsuario = z.object({
-  idUsuario: idSchema
+  cpfUsuario: z
+    .string({ required_error: mensagens.campo })
+    .length(11, { message: "CPF deve conter 11 digitos" })
+    .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" })
 })
 

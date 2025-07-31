@@ -6,7 +6,6 @@ import transmissaoRoutes from './routers/transmissao.js'
 import pautaRoutes from './routers/pauta.js'
 import comentarioRoutes from './routers/comentario.js'
 import votacaoRoutes from './routers/votacao.js'
-import propostaRoutes from './routers/proposta.js'
 import votoRoutes from './routers/voto.js'
 
 
@@ -21,7 +20,6 @@ app.use('/transmissao', transmissaoRoutes)
 app.use('/pauta', pautaRoutes)
 app.use('/comentario', comentarioRoutes)
 app.use('/votacao', votacaoRoutes)
-app.use('/proposta', propostaRoutes)
 app.use('/voto', votoRoutes)
 
 export default app

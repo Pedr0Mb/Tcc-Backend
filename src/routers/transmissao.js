@@ -5,7 +5,6 @@ import { verificarPermissao } from '../middlewares/verificarPermissao.js';
 
 const router = express.Router();
 
-router.get('/', transmissaoController.ListarTransmissoes);
 router.get('/pesquisarTransmissao', transmissaoController.PesquisarTransmissao)
 router.get('/visualizarTransmissao/:id', transmissaoController.VisualizarTransmissao)
 
