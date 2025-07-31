@@ -1,6 +1,6 @@
 import { db } from '../plugins/bd.js'
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
 const JWT_SECRET = 'chave'
 

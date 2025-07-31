@@ -1,6 +1,7 @@
 CREATE DATABASE participacaoCidadaBd;
 USE participacaoCidadaBd;
 
+DROP TABLE IF EXISTS Usuario;
 CREATE TABLE Usuario (
   id_usuario INT NOT NULL AUTO_INCREMENT,
   nm_usuario VARCHAR(100) NOT NULL,
@@ -8,53 +9,73 @@ CREATE TABLE Usuario (
   senha_usuario TEXT NOT NULL,
   nivel_usuario VARCHAR(40) NOT NULL,
   cpf_usuario VARCHAR(11) NOT NULL,
-  cargo_usuario VARCHAR(25) NOT NULL,
+  cargo_usuario ENUM('Administrador','Gestor','cidadao') NOT NULL,
+  secretaria_usuario ENUM('Educação','Segurança','Cultura','Saúde'),
   PRIMARY KEY (id_usuario),
   UNIQUE (cpf_usuario)
 );
 
+CREATE TABLE Permissao (
+  id_permissao INT NOT NULL AUTO_INCREMENT,
+  nome_permissao ENUM('criar', 'editar', 'excluir', 'visualizar') NOT NULL,
+  PRIMARY KEY (id_permissao),
+  UNIQUE (nome_permissao)
+);
+
+CREATE TABLE Permissao (
+  id_permissao INT NOT NULL AUTO_INCREMENT,
+  nome_permissao ENUM('Criar Votacao', 'Publicar Noticia', 'excluir', 'visualizar') NOT NULL,
+  PRIMARY KEY (id_permissao),
+  UNIQUE (nome_permissao)
+);
+
 INSERT INTO Usuario VALUES (null, 'adm', 'adm@gmail', '$2b$10$EnUaPQve1AoLkdMUwja2aubsEp/47g3y0uhX1Tkgi8VNgA0gx5Jq6', 'cidadao', '12345678601', "Administrador");
 
+DROP TABLE IF EXISTS Votacao;
 CREATE TABLE Votacao (
   id_votacao INT NOT NULL AUTO_INCREMENT,
-  titulo_votacao VARCHAR(100) NOT NULL,
-  descricao_votacao TEXT NOT NULL,
-  dataInicio_votacao DATETIME NOT NULL,
+  titulo_votacao VARCHAR(50) NOT NULL,
+  tema_votacao ENUM('Educação','Segurança','Cultura','Saúde') NOT NULL,
+  breveDescritivo_votacao VARCHAR(256) NOT NULL,
+  publicoAlvo_votacao VARCHAR(256) NOT NULL,
+  orçamento_votacao VARCHAR(256) NOT NULL,
+  dataPublicação_votacao DATETIME NOT NULL,
   dataFim_votacao DATETIME NOT NULL,
   status_votacao VARCHAR(30) NOT NULL,
+  anexos_votacao TEXT,
   resultado_votacao VARCHAR(100) DEFAULT NULL,
   id_usuario INT NOT NULL,
   PRIMARY KEY (id_votacao),
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
-CREATE TABLE Proposta (
-  id_proposta INT NOT NULL AUTO_INCREMENT,
-  titulo_proposta VARCHAR(100) NOT NULL,
-  descricao_proposta TEXT NOT NULL,
-  criador_proposta VARCHAR(100) NOT NULL,
-  qtVotos_proposta INT NOT NULL DEFAULT 0,
+DROP TABLE IF EXISTS OpcoesResposta;
+CREATE TABLE OpcoesResposta (
+  id_opcoesResposta INT NOT NULL AUTO_INCREMENT,
+  titulo_opcaoResposta VARCHAR(50) NOT NULL,
+  qtVotos_opcaoResposta INT NOT NULL DEFAULT 0,
   id_votacao INT NOT NULL,
   id_usuario INT NOT NULL,
-  PRIMARY KEY (id_proposta),
+  PRIMARY KEY (id_opcoesResposta),
   FOREIGN KEY (id_votacao) REFERENCES Votacao(id_votacao) ON DELETE CASCADE,
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
+DROP TABLE IF EXISTS Voto;
 CREATE TABLE Voto (
   id_voto INT NOT NULL AUTO_INCREMENT,
-  hash_voto VARCHAR(256) NOT NULL UNIQUE,
   data_voto DATETIME NOT NULL,
   id_usuario INT NOT NULL,
-  id_proposta INT NOT NULL,
+  id_opcoesResposta INT NOT NULL,
   PRIMARY KEY (id_voto),
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
-  FOREIGN KEY (id_proposta) REFERENCES Proposta(id_proposta) ON DELETE CASCADE
+  FOREIGN KEY (id_opcoesResposta) REFERENCES OpcoesResposta(id_opcoesResposta) ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS ResgistroAtividade;
 CREATE TABLE RegistroAtividade (
   id_registroAtividade INT NOT NULL AUTO_INCREMENT,
-  tipo_atividade VARCHAR(45) NOT NULL,
+  tipo_atividade VARCHAR(50) NOT NULL,
   descricao_atividade TEXT,
   link_atividade TEXT,
   date_atividade DATETIME NOT NULL,
@@ -63,11 +84,14 @@ CREATE TABLE RegistroAtividade (
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
+DROP TABLE IF EXISTS Noticia;
 CREATE TABLE Noticia (
   id_noticia INT NOT NULL AUTO_INCREMENT,
-  titulo_noticia VARCHAR(100) NOT NULL,
+  titulo_noticia VARCHAR(50) NOT NULL,
+  tema_noticia ENUM('Educação','Segurança','Cultura','Saúde') NOT NULL,
   dataPublicacao_noticia DATETIME NOT NULL,
-  corpo_noticia TEXT NOT NULL,
+  dataLimite_noticia DATETIME NOT NULL,
+  breveDescritivo_noticia VARCHAR(256) NOT NULL,
   link_noticia TEXT NOT NULL,
   midia_noticia TEXT,
   id_usuario INT NOT NULL,
@@ -75,29 +99,38 @@ CREATE TABLE Noticia (
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
+DROP TABLE IF EXISTS Transmissao;
 CREATE TABLE Transmissao (
   id_transmissao INT NOT NULL AUTO_INCREMENT,
-  titulo_transmissao VARCHAR(100) NOT NULL,
+  titulo_transmissao VARCHAR(50) NOT NULL,
+  subTitulo_transmissao VARCHAR(50) NOT NULL,
+  status_transmissao VARCHAR(30) NOT NULL,
+  dataPublicacao_transmissao DATETIME NOT NULL,
   dataInicio_transmissao DATETIME NOT NULL,
-  descricao_transmissao TEXT NOT NULL,
+  breveDescritivo_transmissao VARCHAR(256) NOT NULL,
   link_transmissao TEXT NOT NULL,
+  midia_transmissao TEXT,
   id_usuario INT NOT NULL,
   PRIMARY KEY (id_transmissao),
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
+DROP TABLE IF EXISTS Pauta;
 CREATE TABLE Pauta (
   id_pauta INT NOT NULL AUTO_INCREMENT ,
-  titulo_pauta VARCHAR(100) NOT NULL,
+  titulo_pauta VARCHAR(50) NOT NULL,
   descricao_pauta TEXT NOT NULL,
-  justificativa_pauta VARCHAR(100) NOT NULL,
+  justificativa_pauta VARCHAR(256) NOT NULL,
   dataPublicacao_pauta DATETIME NOT NULL,
+  dataLimite_pauta DATETIME NOT NULL,
+  anexos_pauta TEXT,
   status_pauta VARCHAR(25) NOT NULL,
   id_usuario INT NOT NULL,
   PRIMARY KEY (id_pauta),
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
+DROP TABLE IF EXISTS Comentario;
 CREATE TABLE Comentario (
   id_comentario INT NOT NULL AUTO_INCREMENT,
   texto_comentario TEXT NOT NULL,
@@ -109,6 +142,7 @@ CREATE TABLE Comentario (
   FOREIGN KEY (id_pauta) REFERENCES Pauta(id_pauta) ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS Notificacao;
 CREATE TABLE Notificacao (
   id_notificacao INT NOT NULL AUTO_INCREMENT,
   titulo_notificacao VARCHAR(100) NOT NULL,

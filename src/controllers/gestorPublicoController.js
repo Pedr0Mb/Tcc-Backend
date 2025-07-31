@@ -30,10 +30,10 @@ export async function PesquisarUsuario(req,res) {
 }
 
 export async function VisualizarUsuario(req,res) {
-  const id = req.params.id
+  const idUsuario = req.params.id
 
   try{
-    const [resultado] = await db.query('CALL visualizarUsuario(?)', [id])
+    const [resultado] = await db.query('CALL visualizarUsuario(?)', [idUsuario])
 
     const usuario = resultado[0] || []
   
@@ -46,10 +46,10 @@ export async function VisualizarUsuario(req,res) {
 }
 
 export async function PromoverUsuario(req,res) {
-  const id = req.params.id
+  const idUsuario = req.params.id
 
   try{
-    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',id])
+    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',idUsuario])
   
     return res.status(200).json({ message: 'Usuario promovido para Gestor Público'})
 

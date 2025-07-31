@@ -1,30 +1,11 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 
-export async function ListarComentario(req,res) {
-  const { idPauta } = req.query
-    try {
-    const [comentarios] = await db.query(`
-      SELECT id_comentario, 
-      texto_comentario, 
-      dataPublicacao_comentario,
-      id_usuario
-      FROM Comentario 
-      WHERE id_pauta = ?`
-    ,[idPauta])
-    return res.status(200).json(comentarios)
-
-  } catch (erro) {
-    console.error('Erro ao listar os comentarios:', erro)
-    return res.status(500).json({ error: 'Erro interno ao listar os comentarios'})
-  }
-}
-
 export async function VisualizarComentario(req,res) {
-  const {id,idPauta} = req.query
+  const {id} = req.query
 
   try{
-    const [resultado] = await db.query('CALL visualizarComentario(?,?)', [id,idPauta])
+    const [resultado] = await db.query('CALL visualizarComentario(?)', [id])
    
     const comentarios = resultado[0] || [];
 
@@ -66,17 +47,17 @@ export async function CriarComentario(req,res) {
 }
 
 export async function AlterarComentario(req,res) {
-    const {id,texto} = req.body
+    const {idComentario,texto} = req.body
     const idUsuario = req.usuario.id
 
-    if(!id || !texto ) return res.status(400).json({ message: 'Preencha todos os campos'})
+    if(!idComentario || !texto ) return res.status(400).json({ message: 'Preencha todos os campos'})
 
-    const [criadorComentario] = await db.query('SELECT id_usuario FROM Comentario WHERE id_comentario = ? AND id_usuario = ?', [id,idUsuario])
+    const [criadorComentario] = await db.query('SELECT id_usuario FROM Comentario WHERE id_comentario = ? AND id_usuario = ?', [idComentario,idUsuario])
 
     if(criadorComentario.length === 0 && req.usuario.cargo == 'cidadao') return res.status(403).json({ message: 'Você não pode alterar esse Comentario'})
 
     try{
-        await db.query('UPDATE Comentario SET texto_comentario = ? WHERE id_comentario = ?', [texto, id])
+        await db.query('UPDATE Comentario SET texto_comentario = ? WHERE id_comentario = ?', [texto, idComentario])
 
         await registrarAtividade('comentario_alterado', 'Comentário alterado', null, idUsuario)
 
@@ -89,17 +70,17 @@ export async function AlterarComentario(req,res) {
 }
 
 export async function DeletarComentario(req,res) {
-    const {id,motivoRemocao} = req.body
+    const {idComentario,motivoRemocao} = req.body
     const idUsuario = req.usuario.id
 
-    if(!id) return res.status(400).json({message: 'Preencha todos os campos'})
+    if(!idComentario) return res.status(400).json({message: 'Preencha todos os campos'})
 
-    const [criadorComentario] = await db.query('SELECT id_usuario FROM Comentario WHERE id_comentario = ? AND id_usuario = ?', [id,idUsuario])
+    const [criadorComentario] = await db.query('SELECT id_usuario FROM Comentario WHERE id_comentario = ? AND id_usuario = ?', [idComentario,idUsuario])
 
     if(criadorComentario.length === 0 && req.usuario.cargo == 'cidadao') return res.status(403).json({ message: 'Você não pode alterar essa Comentario'})
 
      try{
-        await db.query('DELETE FROM Comentario WHERE id_comentario = ?', [id])
+        await db.query('DELETE FROM Comentario WHERE id_comentario = ?', [idComentario])
 
         await registrarAtividade('comentario_removido', motivoRemocao, null, idUsuario)
 
