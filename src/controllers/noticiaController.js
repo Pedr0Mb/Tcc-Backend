@@ -38,6 +38,8 @@ export async function VisualizarNoticia(req,res) {
 export async function CriarNoticia(req,res) {
   const {titulo,tema,dataLimite, breveDescritivo, link, midia} = req.body
   const idGestor = req.usuario.id
+
+  const dtLimite = new Date(dataLimite)
       
   try{
    await db.query(
@@ -52,7 +54,7 @@ export async function CriarNoticia(req,res) {
       midia_noticia,
       id_usuario ) 
       VALUES (?,?, NOW(), ?, 'Ativa', ?, ?, ?, ?)`,
-      [titulo, tema, dataLimite, breveDescritivo, link, midia, idGestor]
+      [titulo, tema, dtLimite, breveDescritivo, link, midia, idGestor]
   );
     
     await registrarAtividade('noticia_criada','Noticia criada',null,idGestor)
@@ -66,9 +68,10 @@ export async function CriarNoticia(req,res) {
 }
     
 export async function AlterarNoticia(req,res) {
-  const {titulo,tema,dataLimite, status, breveDescritivo, link, midia} = req.body
+  const {idNoticia, titulo,tema,dataLimite, status, breveDescritivo, link, midia} = req.body
   const idGestor = req.usuario.id
   
+  const dtLimite = new Date(dataLimite)
         
   try{
     await db.query(`UPDATE Noticia 
@@ -80,7 +83,7 @@ export async function AlterarNoticia(req,res) {
       link_noticia = ?,
       midia_noticia = ?
       WHERE id_noticia = ?`
-      , [titulo, tema, dataLimite, status, breveDescritivo, link, midia, idGestor]
+      , [titulo, tema, dtLimite, status, breveDescritivo, link, midia, idNoticia]
     )
           
     await registrarAtividade('noticia_alterada','Noticia alterada',null,idGestor)

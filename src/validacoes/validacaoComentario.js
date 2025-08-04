@@ -8,11 +8,11 @@ const idSchema = z.number({ required_error: mensagens.campo })
   .int({ message: mensagens.dado })
   .positive({ message: 'Id deve ter valor positivo' })
 
-export const valvisualizarComentario = z.object({
+export const SchemaVisualizarComentario = z.object({
   idComentario: idSchema
 })
 
-export const valCriarComentario = z.object({
+export const SchemaCriarComentario = z.object({
   texto: z
     .string({ required_error: mensagens.campo })
     .max(256, { message: 'Texto deve conter no máximo 256 caractéres' }),
@@ -20,7 +20,7 @@ export const valCriarComentario = z.object({
   idPauta: idSchema
 })
 
-export const valAlterarComentario = z.object({
+export const SchemaAlterarComentario = z.object({
   texto: z
     .string({ required_error: mensagens.campo })
     .max(256, { message: 'Texto deve conter no máximo 256 caractéres' }),
@@ -28,7 +28,7 @@ export const valAlterarComentario = z.object({
   idComentario: idSchema
 })
 
-export const valDeletarComentario = z.object({
+export const SchemaDeletarComentario = z.object({
   motivoRemocao: z
     .string({ required_error: mensagens.campo })
     .max(256, { message: 'Motivo Remoção deve conter no máximo 256 caractéres' }),

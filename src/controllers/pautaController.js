@@ -41,6 +41,8 @@ export async function CriarPauta(req,res) {
     const {titulo, descricao, justificativa, dataLimite, anexos } = req.body
     const idUsuario = req.usuario.id
 
+    const dtLimite = new Date(dataLimite)
+
     try{
         await db.query(
           `INSERT INTO Pauta (
@@ -53,7 +55,7 @@ export async function CriarPauta(req,res) {
           status_pauta,
           id_usuario ) 
           VALUES (?, ?, ?, NOW(), ?, ?, 'Ativa', ?)`,
-          [titulo, descricao, justificativa, dataLimite, anexos, idUsuario]
+          [titulo, descricao, justificativa, dtLimite, anexos, idUsuario]
         )
         await registrarAtividade('pauta_criada', 'Pauta criada', null, idUsuario)
         return res.status(201).json({ message: 'Pauta criada com sucesso'})
@@ -67,6 +69,8 @@ export async function CriarPauta(req,res) {
 export async function AlterarPauta(req,res) {
     const {idPauta, titulo, descricao, justificativa, dataLimite, anexos, status } = req.body
     const idUsuario = req.usuario.id
+
+    const dtLimite = new Date(dataLimite)
 
     const [criadorPauta] = await db.query(
       `SELECT id_usuario 
@@ -87,7 +91,7 @@ export async function AlterarPauta(req,res) {
           anexos_pauta = ?,
           status_pauta ?,
           WHERE id_pauta = ?`, 
-          [titulo, descricao, justificativa, dataLimite, anexos, status, idPauta]
+          [titulo, descricao, justificativa, dtLimite, anexos, status, idPauta]
         )
         
         await registrarAtividade('pauta_alterada', 'Pauta alterada', null, idUsuario)
@@ -100,20 +104,20 @@ export async function AlterarPauta(req,res) {
 }
 
 export async function DeletarPauta(req,res) {
-    const {id,motivoRemocao} = req.body
+    const {idPauta,motivoRemocao} = req.body
     const idUsuario = req.usuario.id
 
     const [criadorPauta] = await db.query(`
       SELECT id_usuario 
       FROM Pauta WHERE id_pauta = ? 
       AND id_usuario = ?`, 
-      [id, idUsuario]
+      [idPauta, idUsuario]
       )
 
     if(criadorPauta.length === 0 && req.usuario.cargo == 'cidadao') return res.status(500).json({ message: 'Você não pode alterar essa pauta'})
 
      try{
-        await db.query('DELETE FROM Pauta WHERE id_pauta = ?', [id])
+        await db.query('DELETE FROM Pauta WHERE id_pauta = ?', [idPauta])
         
         await registrarAtividade('pauta_removida', motivoRemocao , null, idUsuario)
 

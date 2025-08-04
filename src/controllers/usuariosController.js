@@ -5,11 +5,7 @@ import bcrypt from 'bcrypt'
 const JWT_SECRET = 'chave'
 
 export async function criarUsuario(req,res) {
-    const { nome, senha, cpf, email, nivel } = req.body;
-
-    if (!nome || !senha || !email || !cpf || !nivel) return res.status(400).json({ message: 'Preencha todos os campos'})
-    
-    if(senha.length < 6) return res.status(400).json({ message: 'Senha tem que ter no mínimo 6 caracteres'})
+    const { nome, email, senha, nivel, cpf } = req.body;
 
     try{
         const senhaCript = await bcrypt.hash(senha, 10);
@@ -38,15 +34,12 @@ export async function LogarUsuario(req,res) {
     const { cpf, senha} = req.body
 
     try{
-        if (!cpf || !senha){
-            return res.status(400).json({ message: 'Preencha todos os campos'})
-        }
-    
          const [resultado] = await db.query('SELECT * FROM Usuario WHERE cpf_usuario = ?', [cpf])
     
         if (resultado.length === 0) return res.status(404).json({ message: 'Usuário não encontrado'});
     
          const usuario = resultado[0]
+         
          const VerificarSenha = await bcrypt.compare(senha, usuario.senha_usuario)
     
          if (!VerificarSenha) return res.status(401).json({ message: 'Senha incorreta'})

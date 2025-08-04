@@ -1,0 +1,47 @@
+import { z } from 'zod'
+
+const mensagens = {
+  campo: "Campo obrigatório",
+  dado: "Dado inválido"
+}
+
+export const SchemaCriarUsuario = z.object({
+    nome: z
+    .string({ required_error: mensagens.campo })
+    .max(150, { message: 'Nome deve conter no máximo 150 caractéres'}),
+    
+    email: z
+    .string({ required_error: mensagens.campo })
+    .email({ message: 'Email com formato inválido' })   
+    .max(256, { message: 'Email deve conter no máximo 256 caractéres'}),
+
+    senha: z
+    .string({required_error: mensagens.campo})
+    .min(6,{message: 'Senha deve ter no mínimo 6 caractéres'}),
+
+    nivel: z
+    .string({ required_error: mensagens.campo })
+    .max(40, { message: 'Nível deve conter no máximo 40 caractéres'}),
+
+    cpfUsuario: z
+    .string({ required_error: mensagens.campo })
+    .length(11, { message: "CPF deve conter 11 digitos" })
+    .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" })
+    .nullable()
+    .optional(),
+
+})
+
+export const SchemaLogarUsuario = z.object({
+    cpfUsuario: z
+    .string({ required_error: mensagens.campo })
+    .length(11, { message: "CPF deve conter 11 digitos" })
+    .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" })
+    .nullable()
+    .optional(),
+
+    senha: z
+    .string({required_error: mensagens.campo})
+    .min(6,{message: 'Senha deve ter no mínimo 6 caractéres'}),
+
+})

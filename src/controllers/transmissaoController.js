@@ -36,21 +36,25 @@ export async function VisualizarTransmissao(req,res) {
 }
 
 export async function CriarTransmissao(req,res) {
-    const {titulo, dataInicio, descricao, link} = req.body
+    const {titulo, subTitulo,  dataInicio, breveDescritivo, link, midia} = req.body
     const idGestor = req.usuario.id
 
-    if(!titulo || !dataInicio || !descricao || !link) return res.status(400).json({ message: 'Preencha todos os campos'})
+    const dtInicio = new Date(dataInicio)
 
     try{
         await db.query(
           `INSERT INTO Transmissao (
-          titulo_transmissao,
-          dataInicio_transmissao,
-          descricao_transmissao,
-          link_transmissao,
-          id_usuario) 
-          VALUES (?, ?, ?, ?, ?)`,
-          [titulo, dataInicio, descricao, link, idGestor]
+            titulo_transmissao,
+            subTitulo_transmissao,
+            status_transmissao,
+            dataPublicacao_transmissao,
+            dataInicio_transmissao,
+            breveDescritivo_transmissao,
+            link_transmissao,
+            midia_transmissao,
+            id_usuario,) 
+          VALUES (?, ?, 'Agendada', NOW(), ?, ?, ?, ?, ?)`,
+          [titulo, subTitulo, dtInicio, breveDescritivo, link, midia, idGestor]
         );
 
         await registrarAtividade('transmissao_criada', 'Transmissao criada', null, idGestor)
@@ -64,20 +68,23 @@ export async function CriarTransmissao(req,res) {
 }
 
 export async function AlterarTransmissao(req,res) {
-    const {id,titulo,dataInicio,descricao, link} = req.body
+    const {titulo, subTitulo, status, dataInicio, breveDescritivo, link, midia} = req.body
     const idGestor = req.usuario.id
 
-    if(!id || !titulo || !dataInicio || !descricao || !link) return res.status(400).send({ message: 'Preencha todos os campos'})
+    const dtInicio = new Date(dataInicio)
 
     try{
         await db.query(
           `UPDATE Transmissao
-          SET titulo_transmissao = ?, 
-          dataInicio_transmissao = ?, 
-          descricao_transmissao = ?, 
-          link_transmissao = ? 
+          SET titulo_transmissao = ?,
+          subTitulo_transmissao = ?,
+          status_transmissao = ?,
+          dataInicio_transmissao = ?,
+          breveDescritivo_transmissao = ?,
+          link_transmissao = ?,
+          midia_transmissao = ?,
           WHERE id_transmissao = ?`, 
-          [titulo, dataInicio, descricao,link,id]
+          [titulo, subTitulo, status, dtInicio, breveDescritivo, link, midia]
         )
 
         await registrarAtividade('transmissao_alterada', 'Transmissao alterada', null, idGestor)

@@ -40,7 +40,7 @@ CREATE TABLE Votacao (
   orçamento_votacao VARCHAR(256) NOT NULL,
   dataPublicação_votacao DATETIME NOT NULL,
   dataFim_votacao DATETIME NOT NULL,
-  status_votacao VARCHAR(30) NOT NULL,
+  status_votacao ENUM('Agendada','Em andamento','Encerrada') NOT NULL,
   anexos_votacao TEXT,
   resultado_votacao VARCHAR(100) DEFAULT NULL,
   id_usuario INT NOT NULL,

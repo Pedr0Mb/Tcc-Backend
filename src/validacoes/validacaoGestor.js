@@ -9,7 +9,7 @@ const idSchema = z.number({ required_error: mensagens.campo })
   .int({ message: mensagens.dado })
   .positive({ message: 'Id deve ter valor positivo' })
 
-export const valPesquisarUsuario = z.object({
+export const SchemaPesquisarUsuario = z.object({
     nomeUsuario: z
     .string({ required_error: mensagens.campo })
     .max(150, { message:'Nome deve conter no máximo 150 caractéres' })
@@ -30,11 +30,11 @@ export const valPesquisarUsuario = z.object({
     .optional()
 })
 
-export const valVisualizarUsuario = z.object({
+export const SchemaVisualizarUsuario = z.object({
   idUsuario: idSchema
 })
 
-export const valPromoverUsuario = z.object({
+export const SchemaPromoverUsuario = z.object({
   cpfUsuario: z
     .string({ required_error: mensagens.campo })
     .length(11, { message: "CPF deve conter 11 digitos" })
