@@ -9,7 +9,7 @@ const idSchema = z.number({ required_error: mensagens.campo })
   .int({ message: mensagens.dado })
   .positive({ message:'Id deve ter valor positivo' })
   
-export const valPesquisarNoticia = z.object({
+export const SchemaPesquisarNoticia = z.object({
     titulo: z
     .string({ required_error: mensagens.campo })
     .max(50, { message: 'Titulo deve conter no máximo 50 caractéres' })
@@ -29,11 +29,11 @@ export const valPesquisarNoticia = z.object({
     .optional(),
 })
     
-export const valvisualizarNoticia = z.object({
+export const SchemaVisualizarNoticia = z.object({
     idNoticia: idSchema
 })
 
-export const valCriarNoticia = z.object({
+export const SchemaCriarNoticia = z.object({
    titulo: z
     .string({ required_error: mensagens.campo })
     .min(10, { message: 'Titulo deve conter no máximo 10 caractéres' })   
@@ -59,7 +59,7 @@ export const valCriarNoticia = z.object({
     // Falta Validar as imagens
 })
 
-export const valterarNoticia = z.object({
+export const SchemaAlterarNoticia = z.object({
   idNoticia: idSchema,
   
   titulo: z
@@ -91,7 +91,7 @@ export const valterarNoticia = z.object({
   // Falta Validar as imagens
 })
 
-export const valdeletarNoticia = z.object({
+export const SchemaDeletarNoticia = z.object({
   idComentario: idSchema,
 
   motivoRemocao: z

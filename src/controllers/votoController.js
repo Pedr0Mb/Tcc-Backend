@@ -27,9 +27,7 @@ export async function RegistrarVoto(req,res) {
   if(!idProposta ) return res.status(400).json({ message: 'Preencha todos os campos'})
       
   try{
-    const hash = crypto.createHash('sha256').update(`${idUsuario}Voto${idProposta}`).digest('hex');
-
-      await db.query('CALL registrarVoto(?, ?, ?)', [hash, idUsuario, idProposta]);
+      await db.query('CALL registrarVoto(?, ?)', [idUsuario, idProposta]);
         
     await registrarAtividade('voto_registrado','Voto registrado',null,idUsuario)
         

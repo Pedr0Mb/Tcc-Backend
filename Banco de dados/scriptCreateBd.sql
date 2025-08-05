@@ -11,6 +11,7 @@ CREATE TABLE Usuario (
   cpf_usuario VARCHAR(11) NOT NULL,
   cargo_usuario ENUM('Administrador','Gestor','cidadao') NOT NULL,
   secretaria_usuario ENUM('Educação','Segurança','Cultura','Saúde'),
+  imagem_usuario TEXT,
   PRIMARY KEY (id_usuario),
   UNIQUE (cpf_usuario)
 );
