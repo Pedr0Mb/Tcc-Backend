@@ -1,6 +1,5 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
-import crypto from 'crypto';
 
 export async function ListarVoto(req,res) {
     try{

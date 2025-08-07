@@ -7,7 +7,7 @@ CREATE TABLE Usuario (
   nm_usuario VARCHAR(100) NOT NULL,
   email_usuario VARCHAR(100) NOT NULL,
   senha_usuario TEXT NOT NULL,
-  nivel_usuario VARCHAR(40) NOT NULL,
+  telefone_usuario VARCHAR(11),
   cpf_usuario VARCHAR(11) NOT NULL,
   cargo_usuario ENUM('Administrador','Gestor','cidadao') NOT NULL,
   secretaria_usuario ENUM('Educação','Segurança','Cultura','Saúde'),

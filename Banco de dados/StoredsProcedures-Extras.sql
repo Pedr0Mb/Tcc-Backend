@@ -19,3 +19,19 @@ END;
 //
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE VerPermissõesUsuario (IN idUsuario INT)
+BEGIN
+    START TRANSACTION;
+
+    SELECT P.nome_permissao
+    from Permissao P
+    Join PermissaoUsuario PU ON P.id_permissao = PU.id_permissao
+    JOIN Usuario U ON PU.id_usuario = U.id_aluno
+    WHERE U.id_usuario = idUsuario;
+    
+    END IF;
+    COMMIT;
+END;
+//
+DELIMITER ;
