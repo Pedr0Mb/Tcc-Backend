@@ -1,17 +1,23 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
+import * as validacaoTransmissao from '../validacoes/validacaoTransmissao.js'
 
 export async function PesquisarTransmissao(req,res) {
-  const {titulo ,status} = req.query
-
   try{
+    const data = {
+      titulo: req.query.titulo || null,
+      status: req.query.status || null
+    }
+
+    const { titulo, status } = validacaoTransmissao.SchemaPesquisarTransmissao.parse(data)
+
     const [resultado] = await db.query('CALL pesquisarTransmissao(?,?)', [titulo,status])
 
     const transmissoes = resultado[0] || [];
 
     if(transmissoes.length == 0) return res.status(404).json({ message: 'Transmissao não encontrada'})
   
-    return res.status(200).json(transmissoes)
+    return res.status(201).json(transmissoes)
 
   }catch(erro){
     console.error('Erro ao pesquisar Transmissao: ',erro)
@@ -20,14 +26,16 @@ export async function PesquisarTransmissao(req,res) {
 }
 
 export async function VisualizarTransmissao(req,res) {
-  const id = req.params.id
-
   try{
+    const data = { id: Number(req.params.id) }
+
+    const { id } = validacaoTransmissao.SchemaVisualizarTransmissao.parse(data);
+
     const [resultado] = await db.query('CALL visualizarTransmissao(?)', [id])
 
     const transmissao = resultado[0] || []
   
-    return res.status(200).json(transmissao)
+    return res.status(201).json(transmissao)
 
   }catch(erro){
     console.error('Erro ao visualizar Transmissao: ',erro)
@@ -36,30 +44,39 @@ export async function VisualizarTransmissao(req,res) {
 }
 
 export async function CriarTransmissao(req,res) {
-    const {titulo, subTitulo,  dataInicio, breveDescritivo, link, midia} = req.body
-    const idGestor = req.usuario.id
+  try{
+      const idGestor = req.usuario.id
 
-    const dtInicio = new Date(dataInicio)
+      const data = {
+        titulo: req.body.titulo,
+        subTitulo: req.body.subTitulo,
+        dataInicio: new Date(req.body.dataInicio),
+        breveDescritivo: req.body.breveDescritivo,
+        link: req.body.link,
+        imagem: req.body.midia || null,
+      }
 
-    try{
-        await db.query(
-          `INSERT INTO Transmissao (
-            titulo_transmissao,
-            subTitulo_transmissao,
-            status_transmissao,
-            dataPublicacao_transmissao,
-            dataInicio_transmissao,
-            breveDescritivo_transmissao,
-            link_transmissao,
-            midia_transmissao,
-            id_usuario,) 
-          VALUES (?, ?, 'Agendada', NOW(), ?, ?, ?, ?, ?)`,
-          [titulo, subTitulo, dtInicio, breveDescritivo, link, midia, idGestor]
+      const { titulo, subTitulo, dataInicio, breveDescritivo, link, imagem } = validacaoTransmissao.SchemaCriarTransmissao.parse(data);
+
+      await db.query(
+        `INSERT INTO Transmissao (
+          titulo_transmissao,
+          subTitulo_transmissao,
+          status_transmissao,
+          dataPublicacao_transmissao,
+          dataInicio_transmissao,
+          breveDescritivo_transmissao,
+          link_transmissao,
+          imagem_transmissao,
+          id_usuario
+          ) 
+        VALUES (?, ?, 'Agendada', NOW(), ?, ?, ?, ?, ?)`,
+          [titulo, subTitulo, dataInicio, breveDescritivo, link, imagem, idGestor]
         );
 
         await registrarAtividade('transmissao_criada', 'Transmissao criada', null, idGestor)
 
-        return res.status(200).json({ message: 'Transmissao criada com sucesso'})
+        return res.status(201).json({ message: 'Transmissao criada com sucesso'})
 
     }catch(erro){
         console.error('Erro ao criar Transmissao: ',erro)
@@ -68,12 +85,22 @@ export async function CriarTransmissao(req,res) {
 }
 
 export async function AlterarTransmissao(req,res) {
-    const {titulo, subTitulo, status, dataInicio, breveDescritivo, link, midia} = req.body
-    const idGestor = req.usuario.id
+  try{
+      const idGestor = req.usuario.id
 
-    const dtInicio = new Date(dataInicio)
+      const data = {
+        idTransmissao: Number(req.params.id),
+        titulo: req.body.titulo,
+        subTitulo: req.body.subTitulo,
+        status: req.body.status,
+        dataInicio: new Date(req.body.dataInicio),
+        breveDescritivo: req.body.breveDescritivo,
+        link: req.body.link,
+        imagem: req.body.imagem || null,
+      }
 
-    try{
+      const { idTransmissao, titulo, subTitulo, status, dataInicio, breveDescritivo, link, imagem } = validacaoTransmissao.SchemaAlterarTransmissao.parse(data);
+
         await db.query(
           `UPDATE Transmissao
           SET titulo_transmissao = ?,
@@ -82,14 +109,14 @@ export async function AlterarTransmissao(req,res) {
           dataInicio_transmissao = ?,
           breveDescritivo_transmissao = ?,
           link_transmissao = ?,
-          midia_transmissao = ?,
+          imagem_transmissao = ?,
           WHERE id_transmissao = ?`, 
-          [titulo, subTitulo, status, dtInicio, breveDescritivo, link, midia]
+          [titulo, subTitulo, status, dataInicio, breveDescritivo, link, imagem, idTransmissao]
         )
 
         await registrarAtividade('transmissao_alterada', 'Transmissao alterada', null, idGestor)
         
-        return res.status(200).json({ message: 'Transmissao atualizada com sucesso'})
+        return res.status(201).json({ message: 'Transmissao atualizada com sucesso'})
         
       }catch(erro){
         console.error('Erro ao atualizar Transmissao: ',erro)
@@ -98,15 +125,21 @@ export async function AlterarTransmissao(req,res) {
     }
     
     export async function DeletarTransmissao(req,res) {
-      const {id,motivoRemocao} = req.body
-      const idGestor = req.usuario.id
-      
       try{
+        const idGestor = req.usuario.id
+
+        const data = { 
+          id: Number(req.params.id), 
+          motivoRemocao: req.body.motivoRemocao 
+        }
+
+        const { id, motivoRemocao } = validacaoTransmissao.SchemaDeletarTransmissao.parse(data);
+
         await db.query('DELETE FROM Transmissao WHERE id_transmissao = ?', [id])
         
         await registrarAtividade('transmissao_removida', motivoRemocao, null, idGestor)
 
-        return res.status(200).json({ message: 'Transmissao deletada com sucesso'})
+        return res.status(201).json({ message: 'Transmissao deletada com sucesso'})
 
     }catch(erro){
         console.error('Erro ao deletar Transmissao: ',erro)

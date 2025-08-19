@@ -18,7 +18,7 @@ export const SchemaPesquisarTransmissao = z.object({
       
      status: z
     .string({ required_error: mensagens.campo })
-    .enum(['Ativo','Inativo'], {message: 'Opção de status invalido '})
+    .enum(['Ativo','Inativo'])
     .nullable()
     .optional(),
 })
@@ -49,9 +49,11 @@ export const SchemaCriarTransmissao = z.object({
 
     link: z
     .string({ required_error: mensagens.campo })
-    .link({ message: 'Link em Link com formato invalido' }),
+    .url({ message: 'Link com formato invalido' }),
 
-    // Falta Validar as imagens
+    imagem: z
+    .string({ required_error: mensagens.campo })
+    .url({ message: 'Link com formato invalido' }),
 })
 
 export const SchemaAlterarTransmissao = z.object({
@@ -82,9 +84,11 @@ export const SchemaAlterarTransmissao = z.object({
 
     link: z
     .string({ required_error: mensagens.campo })
-    .link({ message: 'Link com formato invalido' }),
+    .url({ message: 'Link com formato invalido' }),
 
-    // Falta Validar as imagens
+     imagem: z
+    .string({ required_error: mensagens.campo })
+    .url({ message: 'Link com formato invalido' }),
 })
 
 export const SchemaDeletarTransmissao = z.object({

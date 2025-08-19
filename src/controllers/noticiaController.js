@@ -1,10 +1,17 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
+import * as validacaoNoticia from '../validacoes/validacaoNoticia.js'
 
 export async function PesquisarNoticia(req,res) {
-  const {titulo, tema, status} = req.query
-
   try{
+    const data = {
+      titulo: req.query.titulo || null,
+      tema: req.query.tema || null,
+      status: req.query.status || null
+    }
+
+    const { titulo, tema, status } = validacaoNoticia.SchemaPesquisarNoticia.parse(data)
+    
     const [resultado] = await db.query('CALL pesquisarNoticias(?,?,?)', [titulo,tema,status])
    
     const noticias = resultado[0] || [];
@@ -20,10 +27,12 @@ export async function PesquisarNoticia(req,res) {
 }
 
 export async function VisualizarNoticia(req,res) {
-  const id = req.params.id
-
   try{
-    const [resultado] = await db.query('CALL visualizarNoticia(?)', [id])
+    const data = { idNoticia: Number(req.params.id) }
+
+    const { idNoticia } = validacaoNoticia.SchemaVisualizarNoticia.parse(data);
+
+    const [resultado] = await db.query('CALL visualizarNoticia(?)', [idNoticia])
     
     const noticia = resultado[0] || [];
    
@@ -36,13 +45,21 @@ export async function VisualizarNoticia(req,res) {
 }
 
 export async function CriarNoticia(req,res) {
-  const {titulo,tema,dataLimite, breveDescritivo, link, midia} = req.body
-  const idGestor = req.usuario.id
-
-  const dtLimite = new Date(dataLimite)
-      
   try{
-   await db.query(
+  const idGestor = req.usuario.id
+   
+  const data = {
+    titulo: req.body.titulo,
+    tema: req.body.tema,
+    dataLimite: new Date(req.body.dataLimite),
+    breveDescritivo: req.body.breveDescritivo,
+    link: req.body.link,
+    imagem: req.body.imagem
+  }
+
+  const { titulo, tema, dataLimite, breveDescritivo, link, imagem } = validacaoNoticia.SchemaCriarNoticia.parse(data);
+  
+  await db.query(
       `INSERT INTO Noticia (
       titulo_noticia,
       tema_noticia,
@@ -51,10 +68,10 @@ export async function CriarNoticia(req,res) {
       status_noticia,
       breveDescritivo_noticia,
       link_noticia,
-      midia_noticia,
+      imagem_noticia,
       id_usuario ) 
       VALUES (?,?, NOW(), ?, 'Ativa', ?, ?, ?, ?)`,
-      [titulo, tema, dtLimite, breveDescritivo, link, midia, idGestor]
+      [titulo, tema, dataLimite, breveDescritivo, link, imagem, idGestor]
   );
     
     await registrarAtividade('noticia_criada','Noticia criada',null,idGestor)
@@ -68,12 +85,22 @@ export async function CriarNoticia(req,res) {
 }
     
 export async function AlterarNoticia(req,res) {
-  const {idNoticia, titulo,tema,dataLimite, status, breveDescritivo, link, midia} = req.body
-  const idGestor = req.usuario.id
-  
-  const dtLimite = new Date(dataLimite)
-        
   try{
+    const idGestor = req.usuario.id
+    
+    const data = {
+      idNoticia: Number(req.body.idNoticia),
+      titulo: req.body.titulo,
+      tema: req.body.tema,
+      dataLimite: new Date(req.body.dataLimite),
+      status: req.body.status,
+      breveDescritivo: req.body.breveDescritivo,
+      link: req.body.link,
+      imagem: req.body.imagem
+    }
+
+    const { idNoticia, titulo, tema, dataLimite, status, breveDescritivo, link, imagem } = validacaoNoticia.SchemaAlterarNoticia.parse(data);
+
     await db.query(`UPDATE Noticia 
       SET titulo_noticia = ?, 
       tema_noticia = ?,
@@ -81,9 +108,9 @@ export async function AlterarNoticia(req,res) {
       status_noticia = ?,
       breveDescritivo_noticia = ?,
       link_noticia = ?,
-      midia_noticia = ?
+      imagem_noticia = ?
       WHERE id_noticia = ?`
-      , [titulo, tema, dtLimite, status, breveDescritivo, link, midia, idNoticia]
+      , [titulo, tema, dataLimite, status, breveDescritivo, link, imagem, idNoticia]
     )
           
     await registrarAtividade('noticia_alterada','Noticia alterada',null,idGestor)
@@ -97,11 +124,17 @@ export async function AlterarNoticia(req,res) {
 }
       
 export async function DeletarNoticia(req,res) {
-  const {id,motivoRemocao} = req.body
-  const idGestor = req.usuario.id
-
   try{
-    await db.query('DELETE FROM Noticia WHERE id_noticia = ?', [id])
+    const idGestor = req.usuario.id
+
+    const data = { 
+      idNoticia: Number(req.params.id), 
+      motivoRemocao: req.body.motivoRemocao 
+    };
+
+    const { idNoticia, motivoRemocao } = validacaoNoticia.SchemaDeletarNoticia.parse(data);
+
+    await db.query('DELETE FROM Noticia WHERE id_noticia = ?', [idNoticia])
 
     await registrarAtividade('noticia_removida',motivoRemocao,null,idGestor)
 

@@ -1,9 +1,16 @@
 import { db } from '../plugins/bd.js'
+import * as validacaoGestor from '../validacoes/validacaoGestor.js'
 
 export async function PesquisarUsuario(req,res) {
-  const {nomeUsuario ,cpfUsuario, cargoUsuario} = req.query
-
   try{
+    const data = {
+      nomeUsuario: req.query.nome || null,
+      cpfUsuario: req.query.cpf || null,
+      cargoUsuario: req.query.cargo || null
+    }
+
+    const { nomeUsuario, cpfUsuario, cargoUsuario } = validacaoGestor.SchemaPesquisarUsuario.parse(data)
+
     const [resultado] = await db.query('CALL pesquisarUsuarios(?,?,?)', [nomeUsuario,cpfUsuario,cargoUsuario])
    
     const usuarios = resultado[0] || []
@@ -19,9 +26,11 @@ export async function PesquisarUsuario(req,res) {
 }
 
 export async function VisualizarUsuario(req,res) {
-  const idUsuario = req.params.id
-
   try{
+    const data = { idUsuario: Number(req.params.id) };
+
+    const { idUsuario } = validacaoGestor.SchemaVisualizarUsuario.parse(data);
+
     const [resultado] = await db.query('CALL visualizarUsuario(?)', [idUsuario])
 
     const usuario = resultado[0] || []
@@ -35,10 +44,12 @@ export async function VisualizarUsuario(req,res) {
 }
 
 export async function PromoverUsuario(req,res) {
-  const cpf = req.params.id
-
   try{
-    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',cpf])
+    const data = { cpfUsuario: req.params.cpf };
+
+    const { cpfUsuario } = validacaoGestor.SchemaPromoverUsuario.parse(data);
+
+    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',cpfUsuario])
   
     return res.status(200).json({ message: 'Usuario promovido para Gestor Público'})
 

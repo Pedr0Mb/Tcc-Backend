@@ -19,10 +19,6 @@ export const SchemaCriarUsuario = z.object({
     .string({required_error: mensagens.campo})
     .min(6,{message: 'Senha deve ter no mínimo 6 caractéres'}),
 
-    nivel: z
-    .string({ required_error: mensagens.campo })
-    .max(40, { message: 'Nível deve conter no máximo 40 caractéres'}),
-
     cpfUsuario: z
     .string({ required_error: mensagens.campo })
     .length(11, { message: "CPF deve conter 11 digitos" })
@@ -45,3 +41,5 @@ export const SchemaLogarUsuario = z.object({
     .min(6,{message: 'Senha deve ter no mínimo 6 caractéres'}),
 
 })
+
+

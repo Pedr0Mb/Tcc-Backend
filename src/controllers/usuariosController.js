@@ -1,13 +1,21 @@
 import { db } from '../plugins/bd.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import * as validacaoUsuario from '../validacoes/validacaoUsuario.js'
 
 const JWT_SECRET = 'chave'
 
 export async function criarUsuario(req,res) {
-    const { nome, email, senha, nivel, cpf } = req.body;
-
     try{
+        const data = {
+            nome: req.body.nome,
+            email: req.body.email,
+            senha: req.body.senha,  
+            cpfUsuario: req.body.cpfUsuario
+        }
+
+        const { nome, email, senha, cpfUsuario } = validacaoUsuario.SchemaCriarUsuario.parse(data);
+        
         const senhaCript = await bcrypt.hash(senha, 10);
         
         await db.query(
@@ -15,11 +23,10 @@ export async function criarUsuario(req,res) {
             nm_usuario,
             email_usuario,
             senha_usuario,
-            nivel_usuario,
             cpf_usuario,
             cargo_usuario ) 
-            VALUES (?, ?, ?, ?, ?, 'cidadao')`,
-            [nome, email, senhaCript, nivel, cpf]
+            VALUES (?, ?, ?, ?, 'cidadao')`,
+            [nome, email, senhaCript, cpfUsuario]
         );
 
         return res.status(201).json({ message: 'Usuario Cadastrado Com sucesso'})
@@ -31,10 +38,15 @@ export async function criarUsuario(req,res) {
 }
 
 export async function LogarUsuario(req,res) {
-    const { cpf, senha} = req.body
-
     try{
-         const [resultado] = await db.query('SELECT * FROM Usuario WHERE cpf_usuario = ?', [cpf])
+        const data = {
+            cpfUsuario: req.body.cpfUsuario,
+            senha: req.body.senha
+        }
+
+        const { cpfUsuario, senha } = validacaoTransmissao.validacaoUsuario.parse(data);
+
+         const [resultado] = await db.query('SELECT * FROM Usuario WHERE cpf_usuario = ?', [cpfUsuario])
     
         if (resultado.length === 0) return res.status(404).json({ message: 'Usuário não encontrado'});
     
@@ -59,9 +71,9 @@ export async function LogarUsuario(req,res) {
 }
 
 export async function VerMeuUsaurio(req,res) {
-    const id = req.usuario.id
-
     try{
+        const id = req.usuario.id
+
         const [resultado] = await db.query('CALL visualizarUsuario(?)',[id])
 
         const usuario = resultado[0] 

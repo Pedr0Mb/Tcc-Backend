@@ -18,7 +18,7 @@ export const SchemaPesquisarPauta = z.object({
       
      status: z
     .string({ required_error: mensagens.campo })
-    .enum(['Ativo','Inativo'], {message: 'Opção de status invalido '})
+    .enum(['Ativo','Inativo'])
     .nullable()
     .optional(),
 })
@@ -36,18 +36,20 @@ export const SchemaCriarPauta = z.object({
     descricao: z
     .string({ required_error: mensagens.campo })
     .min(10, { message: 'Descricão deve conter no mínimo 10 caractéres' })   
-    .max(256, { message: 'Descricão deve conter no máximo 50 caractéres' }),
+    .max(256, { message: 'Descricão deve conter no máximo 256 caractéres' }),
 
     justificativa: z
     .string({ required_error: mensagens.campo })
     .min(10, { message: 'Justificativa deve conter no mínimo 10 caractéres' })   
-    .max(256, { message: 'Justificativa deve conter no máximo 50 caractéres' }),
+    .max(256, { message: 'Justificativa deve conter no máximo 256 caractéres' }),
 
     dataLimite: z
     .date({required_error: mensagens.campo})
     .refine(date => date > new Date(),{message: 'Data deve ser futura '}),
 
-    // Falta Validar as imagens
+    imagem: z
+    .string({required_error: mensagens.campo})
+    .url({message: 'Link com formato invalido'}),
 })
 
 export const SchemaAlterarPauta = z.object({
@@ -61,12 +63,12 @@ export const SchemaAlterarPauta = z.object({
     descricao: z
     .string({ required_error: mensagens.campo })
     .min(10, { message: 'Descricão deve conter no mínimo 10 caractéres' })   
-    .max(256, { message: 'Descricão deve conter no máximo 50 caractéres' }),
+    .max(256, { message: 'Descricão deve conter no máximo 256 caractéres' }),
 
     justificativa: z
     .string({ required_error: mensagens.campo })
     .min(10, { message: 'Justificativa deve conter no mínimo 10 caractéres' })   
-    .max(256, { message: 'Justificativa deve conter no máximo 50 caractéres' }),
+    .max(256, { message: 'Justificativa deve conter no máximo 256 caractéres' }),
 
     dataLimite: z
     .date({required_error: mensagens.campo})
@@ -74,9 +76,11 @@ export const SchemaAlterarPauta = z.object({
 
     status: z
     .string({ required_error: mensagens.campo })
-    .enum(['Ativo','Inativo'], {message: 'Opção de status invalido '})
+    .enum(['Ativo','Inativo'], {message: 'Opção de status invalido '}),
     
-    // Falta Validar as imagens
+    imagem: z
+    .string({required_error: mensagens.campo})
+    .url({message: 'Link com formato invalido'}),
 })
 
 export const SchemaDeletarPauta = z.object({

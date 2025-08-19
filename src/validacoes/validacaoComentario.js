@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 const mensagens = {
-  campo: "Campo obrigatório"
+  campo: "Campo obrigatório",
+  dado: "dado inválido"
 }
 
 const idSchema = z.number({ required_error: mensagens.campo })

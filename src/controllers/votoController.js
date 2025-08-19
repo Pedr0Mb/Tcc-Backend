@@ -1,11 +1,11 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
+import * as validacaoVotacao from '../validacoes/validacaoVotacao.js'
 
 export async function ListarVoto(req,res) {
     try{
         const [votos] = await db.query(
           `SELECT id_voto, 
-          hash_voto, 
           data_voto, 
           id_usuario 
           FROM Voto`
@@ -20,13 +20,14 @@ export async function ListarVoto(req,res) {
 }
 
 export async function RegistrarVoto(req,res) {
-  const {idProposta} = req.body
-  const idUsuario = req.usuario.id
-    
-  if(!idProposta ) return res.status(400).json({ message: 'Preencha todos os campos'})
-      
   try{
-      await db.query('CALL registrarVoto(?, ?)', [idUsuario, idProposta]);
+    const idUsuario = req.usuario.id
+
+    const data = {idProposta: Number(req.body.idProposta)}
+
+    const { idProposta } = validacaoVotacao.SchemaRegistrarVoto.parse(data);
+
+    await db.query('CALL registrarVoto(?, ?)', [idUsuario, idProposta]);
         
     await registrarAtividade('voto_registrado','Voto registrado',null,idUsuario)
         

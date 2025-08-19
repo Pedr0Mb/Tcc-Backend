@@ -1,10 +1,17 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
+import * as validacaoVotacao from '../validacoes/validacaoVotacao.js'
 
 export async function PesquisarVotacoes(req,res) {
-  const {titulo ,status, tema} = req.query
-
   try{
+    const data = {
+      status: req.query.status || null,
+      titulo: req.query.titulo || null,
+      tema: req.query.tema || null
+    }
+
+    const { status, titulo, tema } = validacaoVotacao.SchemaPesquisarVotacao.parse(data)
+    
     const [resultado] = await db.query('CALL pesquisarVotacoes(?,?,?)', [status, titulo,tema])
    
     const votacoes = resultado[0] || [];
@@ -38,11 +45,24 @@ export async function VisualizarVotacao(req, res) {
 
 
 export async function CriarVotacao(req,res) {
-  const {titulo, tema, breveDescritivo,publicoAlvo,orcamento, dataFim, anexos, resultado, opcoesResposta} = req.body
-  const idGestor = req.usuario.id
-      
   try{
-   const [resultadoVotacao] = await db.execute(
+    const idGestor = req.usuario.id
+
+    const data = {
+      titulo: req.body.titulo,
+      tema: req.body.tema,
+      breveDescritivo: req.body.breveDescritivo,
+      publicoAlvo: req.body.publicoAlvo,
+      orcamento: req.body.orcamento,
+      dataFim: new Date(req.body.dataFim),
+      imagem: req.body.imagem || null,
+      resultado: req.body.resultado || null,
+      opcoesResposta: req.body.opcoesResposta
+    }
+
+    const { titulo, tema, breveDescritivo, publicoAlvo, orcamento, dataFim, imagem, resultado, opcoesResposta } = validacaoVotacao.SchemaCriarVotacao.parse(data);
+
+    const [resultadoVotacao] = await db.execute(
       `INSERT INTO Votacao (
       titulo_votacao,
       tema_votacao,
@@ -52,71 +72,102 @@ export async function CriarVotacao(req,res) {
       dataPublicação_votacao,
       dataFim_votacao,
       status_votacao,
-      anexos_votacao,
+      imagem_votacao,
       resultado_votacao,
       id_usuario )
-      VALUES (?, ?, ?, ?, ?, 'NOW()', ?, 'Ativa', ?, ?, ?)`,
-      [titulo,tema, breveDescritivo,publicoAlvo,orcamento, dataFim, anexos, resultado, idGestor]
+      VALUES (?, ?, ?, ?, ?, NOW(), ?, 'Ativa', ?, ?, ?)`,
+      [titulo, tema, breveDescritivo, publicoAlvo, orcamento, dataFim, imagem, resultado, idGestor]
     )
 
-    const idVotacao = resultadoVotacao.id_votacao
-     
-     for (const opcoes of opcoesResposta) {
-      await db.query(`
-        INSERT INTO OpcoesResposta (
+    const idVotacao = resultadoVotacao.insertId || resultadoVotacao.id_votacao;
+
+    for (const opcao of opcoesResposta) {
+      const { titulo } = validacaoVotacao.schemaOpcoesResposta.parse(opcao);
+      await db.query(
+        `INSERT INTO OpcoesResposta (
         titulo_opcaoResposta, 
         id_votacao,
         id_usuario)
-        VALUES (?,?,?)
-      `,[opcoes,idVotacao,idGestor])
-     }
+        VALUES (?,?,?)`,
+        [titulo, idVotacao, idGestor]
+      );
+    }
 
     await registrarAtividade('votacao_criada','Votação criada',null,idGestor)
-        
     return res.status(201).json({ message: 'Votação criada com sucesso'})
-        
   }catch(erro){
     console.error('Erro ao criar votação: ',erro)
     return res.status(500).json({ error: 'Erro ao criar votação'})
   }
 }
     
-export async function AlterarVotacao(req,res) {
-  const {idVotacao, titulo, tema, breveDescritivo,publicoAlvo,orcamento, dataFim, status, anexos, resultado} = req.body
-  const idGestor = req.usuario.id
-        
-  try{
+export async function AlterarVotacao(req, res) {
+  try {
+    const idGestor = req.usuario.id;
+    const data = {
+      idVotacao: Number(req.params.id),
+      titulo: req.body.titulo,
+      tema: req.body.tema,
+      breveDescritivo: req.body.breveDescritivo,
+      publicoAlvo: req.body.publicoAlvo,
+      orcamento: req.body.orcamento,
+      dataFim: new Date(req.body.dataFim),
+      status: req.body.status,
+      imagem: req.body.imagem || null,
+      resultado: req.body.resultado || null,
+      opcoesResposta: req.body.opcoesResposta,
+    };
+    const { idVotacao, titulo, tema, breveDescritivo, publicoAlvo, orcamento, dataFim, status, imagem, resultado, opcoesResposta } = validacaoVotacao.SchemaAlterarVotacao.parse(data);
+
     await db.query(
       `UPDATE Votacao 
       SET titulo_votacao = ?, 
-      tema_votacao = ?,
-      breveDescritivo_votacao = ?,
-      publicoAlvo_votacao = ?
-      orçamento_votacao = ?,
-      dataFim_votacao = ?,
-      status_votacao = ?,
-      anexos_votacao = ?,
-      resultado_votacao = ?,
-      WHERE id_votacao = ?`, 
-      [titulo,tema, breveDescritivo,publicoAlvo,orcamento, dataFim, status, anexos, resultado, idVotacao]
-    )
-          
-    await registrarAtividade('votacao_alterada','Votação alterada',null,idGestor)
-          
-    return res.status(200).json({ message: 'Votação atualizada com sucesso'})
-          
-    }catch(erro){
-      console.error('Erro ao atualizar votação: ',erro)
-      return res.status(500).json({ error: 'Erro ao atualizar votação'})
+          tema_votacao = ?,
+          breveDescritivo_votacao = ?,
+          publicoAlvo_votacao = ?,
+          orçamento_votacao = ?,
+          dataFim_votacao = ?,
+          status_votacao = ?,
+          imagem_votacao = ?,
+          resultado_votacao = ?
+      WHERE id_votacao = ?`,
+      [titulo, tema, breveDescritivo, publicoAlvo, orcamento, dataFim, status, imagem, resultado, idVotacao]
+    );
+
+    await db.query('DELETE FROM OpcoesResposta WHERE id_votacao = ?', [idVotacao]);
+
+    for (const opcao of opcoesResposta) {
+      const { titulo } = validacaoVotacao.schemaOpcoesResposta.parse({ idVotacao, ...opcao });
+      await db.query(
+        `INSERT INTO OpcoesResposta (
+          titulo_opcaoResposta,
+          id_votacao,
+          id_usuario
+        ) VALUES (?, ?, ?)`,
+        [titulo, idVotacao, idGestor]
+      );
     }
+
+    await registrarAtividade('votacao_alterada', 'Votação alterada', null, idGestor);
+    return res.status(200).json({ message: 'Votação atualizada com sucesso' });
+  } catch (erro) {
+    console.error('Erro ao atualizar votação: ', erro);
+    return res.status(500).json({ error: 'Erro ao atualizar votação' });
+  }
 }
     
 export async function DeletarVotacao(req,res) {
-  const {id,motivoRemocao} = req.body
-  const idGestor = req.usuario.id
-
   try{
-    await db.query('DELETE FROM Votacao WHERE id_votacao = ?', [id])
+    const idGestor = req.usuario.id
+
+    const data = {
+      idVotacao: Number(req.params.idVotacao),
+      motivoRemocao: req.body.motivoRemocao
+    }
+
+    const { idVotacao, motivoRemocao } = validacaoVotacao.SchemaDeletarVotacao.parse(data);
+
+    await db.query('DELETE FROM Votacao WHERE id_votacao = ?', [idVotacao])
 
     await registrarAtividade('votacao_removida',motivoRemocao,null,idGestor)
 

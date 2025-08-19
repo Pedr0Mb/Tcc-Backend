@@ -25,7 +25,7 @@ export const SchemaPesquisarUsuario = z.object({
 
     cargoUsuario: z
     .string({ required_error: mensagens.campo })
-    .enum(['Administrador','Gestor','cidadao'], {message: "Opção de Cargo Invalido"})
+    .enum(['Administrador','Gestor','cidadao'])
     .nullable()
     .optional()
 })

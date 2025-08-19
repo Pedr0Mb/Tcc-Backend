@@ -1,10 +1,16 @@
 import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
+import * as validacaoPauta from '../validacoes/validacaoPauta.js'
 
-export async function PesquisarPauta(req,res) {
-  const {titulo ,status} = req.query
-
+export async function PesquisarPauta(req,res) {  
   try{
+    const data = {
+      titulo: req.query.titulo || null,
+      status: req.query.status || null
+    }
+
+    const { titulo, status } = validacaoPauta.SchemaPesquisarPauta.parse(data)
+
     const [resultado] = await db.query('CALL pesquisarPautas(?,?)', [titulo,status])
    
     const pautas = resultado[0] || [];
@@ -20,10 +26,12 @@ export async function PesquisarPauta(req,res) {
 }
 
 export async function VisualizarPauta(req, res) {
-  const id = req.params.id;
-
   try {
-    const [resultado] = await db.query('CALL visualizarPauta(?)', [id]);
+    const data = { idPauta: Number(req.params.id) }
+
+    const { idPauta } = validacaoPauta.SchemaVisualizarPauta.parse(data);
+
+    const [resultado] = await db.query('CALL visualizarPauta(?)', [idPauta]);
 
     const pauta = resultado[0][0] || {}; 
     const comentarios = resultado[1] || []; 
@@ -37,13 +45,19 @@ export async function VisualizarPauta(req, res) {
 }
 
 
-export async function CriarPauta(req,res) {
-    const {titulo, descricao, justificativa, dataLimite, anexos } = req.body
-    const idUsuario = req.usuario.id
+export async function CriarPauta(req,res) {  
+  try{
+      const idUsuario = req.usuario.id
+      const data = {
+        titulo: req.body.titulo,
+        descricao: req.body.descricao,
+        justificativa: req.body.justificativa,
+        dataLimite: new Date(req.body.dataLimite),
+        imagem: req.body.imagem || null,
+      } 
 
-    const dtLimite = new Date(dataLimite)
+      const { titulo, descricao, justificativa, dataLimite, imagem } = validacaoPauta.SchemaCriarPauta.parse(data);
 
-    try{
         await db.query(
           `INSERT INTO Pauta (
           titulo_pauta,
@@ -51,11 +65,11 @@ export async function CriarPauta(req,res) {
           justificativa_pauta,
           dataPublicacao_pauta,
           dataLimite_pauta,
-          anexos_pauta,
+          imagem_pauta,
           status_pauta,
           id_usuario ) 
           VALUES (?, ?, ?, NOW(), ?, ?, 'Ativa', ?)`,
-          [titulo, descricao, justificativa, dtLimite, anexos, idUsuario]
+          [titulo, descricao, justificativa, dataLimite, imagem, idUsuario]
         )
         await registrarAtividade('pauta_criada', 'Pauta criada', null, idUsuario)
         return res.status(201).json({ message: 'Pauta criada com sucesso'})
@@ -67,32 +81,41 @@ export async function CriarPauta(req,res) {
 }
 
 export async function AlterarPauta(req,res) {
-    const {idPauta, titulo, descricao, justificativa, dataLimite, anexos, status } = req.body
-    const idUsuario = req.usuario.id
+  try{
+  const idUsuario = req.usuario.id
 
-    const dtLimite = new Date(dataLimite)
+  const data = {
+    idPauta: Number(req.params.id),
+    titulo: req.body.titulo,
+    descricao: req.body.descricao,
+    justificativa: req.body.justificativa,
+    dataLimite: new Date(req.body.dataLimite),
+    imagem: req.body.imagem || null,
+    status: req.body.status || 'Ativo'
+  }
 
-    const [criadorPauta] = await db.query(
-      `SELECT id_usuario 
-      FROM Pauta
-      WHERE id_pauta = ? AND id_usuario = ?`, 
-      [idPauta, idUsuario]
+  const { idPauta, titulo, descricao, justificativa, dataLimite, imagem, status } = validacaoPauta.SchemaAlterarPauta.parse(data);
+
+  const [criadorPauta] = await db.query(
+    `SELECT id_usuario 
+    FROM Pauta
+    WHERE id_pauta = ? AND id_usuario = ?`, 
+    [idPauta, idUsuario]
+  )
+
+  if(criadorPauta.length === 0 && req.usuario.cargo == 'cidadao') return res.status(403).json({ message: 'Você não pode alterar essa pauta'})
+        
+  await db.query(
+      `UPDATE Pauta 
+      SET titulo_pauta = ?,
+      descricao_pauta = ?,
+      justificativa_pauta = ?,
+      dataLimite_pauta = ?,
+      imagem_pauta = ?,
+      status_pauta = ?
+      WHERE id_pauta = ?`, 
+      [titulo, descricao, justificativa, dataLimite, imagem, status, idPauta]
     )
-
-    if(criadorPauta.length === 0 && req.usuario.cargo == 'cidadao') return res.status(500).json({ message: 'Você não pode alterar essa pauta'})
-
-    try{
-        await db.query(
-          `UPDATE Pauta 
-          titulo_pauta = ?,
-          descricao_pauta = ?,
-          justificativa_pauta = ?,
-          dataLimite_pauta = ?,
-          anexos_pauta = ?,
-          status_pauta ?,
-          WHERE id_pauta = ?`, 
-          [titulo, descricao, justificativa, dtLimite, anexos, status, idPauta]
-        )
         
         await registrarAtividade('pauta_alterada', 'Pauta alterada', null, idUsuario)
         return res.status(200).json({ message: 'Pauta atualizada com sucesso'})
@@ -104,27 +127,33 @@ export async function AlterarPauta(req,res) {
 }
 
 export async function DeletarPauta(req,res) {
-    const {idPauta,motivoRemocao} = req.body
+  try{
     const idUsuario = req.usuario.id
 
+    const data = {
+      idPauta: Number(req.params.id),
+      motivoRemocao: req.body.motivoRemocao
+    }
+
+    const { idPauta, motivoRemocao } = validacaoPauta.SchemaDeletarPauta.parse(data);
+  
     const [criadorPauta] = await db.query(`
       SELECT id_usuario 
       FROM Pauta WHERE id_pauta = ? 
       AND id_usuario = ?`, 
       [idPauta, idUsuario]
-      )
-
+    )
+  
     if(criadorPauta.length === 0 && req.usuario.cargo == 'cidadao') return res.status(500).json({ message: 'Você não pode alterar essa pauta'})
-
-     try{
-        await db.query('DELETE FROM Pauta WHERE id_pauta = ?', [idPauta])
+      
+    await db.query('DELETE FROM Pauta WHERE id_pauta = ?', [idPauta])
         
-        await registrarAtividade('pauta_removida', motivoRemocao , null, idUsuario)
+    await registrarAtividade('pauta_removida', motivoRemocao , null, idUsuario)
 
-        return res.status(200).json({ message: 'Pauta deletada com sucesso'})
+    return res.status(200).json({ message: 'Pauta deletada com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao atualizar Pauta: ',erro)
-        return res.status(500).json({ error: 'Erro interno ao deletar Pauta'})
-    }
+  }catch(erro){
+      console.error('Erro ao atualizar Pauta: ',erro)
+      return res.status(500).json({ error: 'Erro interno ao deletar Pauta'})
+  }
 }

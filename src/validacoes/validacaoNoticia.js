@@ -24,7 +24,7 @@ export const SchemaPesquisarNoticia = z.object({
 
      status: z
     .string({ required_error: mensagens.campo })
-    .enum(['Ativo','Inativo'], {message: 'Opção de status invalido '})
+    .enum(['Ativo','Inativo'])
     .nullable()
     .optional(),
 })
@@ -36,12 +36,12 @@ export const SchemaVisualizarNoticia = z.object({
 export const SchemaCriarNoticia = z.object({
    titulo: z
     .string({ required_error: mensagens.campo })
-    .min(10, { message: 'Titulo deve conter no máximo 10 caractéres' })   
+    .min(10, { message: 'Titulo deve conter no minímmo 10 caractéres' })   
     .max(50, { message: 'Titulo deve conter no máximo 50 caractéres' }),
       
-     tema: z
+    tema: z
     .string({ required_error: mensagens.campo })
-    .enum(['Educação','Segurança','Cultura','Saúde'], {message: 'Opção de tema invalido '}),
+    .enum(['Educação','Segurança','Cultura','Saúde']),
 
     dataLimite: z
     .date({required_error: mensagens.campo})
@@ -56,7 +56,9 @@ export const SchemaCriarNoticia = z.object({
     .string({required_error: mensagens.campo})
     .url({message: 'Link com formato invalido'}),
 
-    // Falta Validar as imagens
+    imagem: z
+    .string({required_error: mensagens.campo})
+    .url({message: 'Link com formato invalido'}),
 })
 
 export const SchemaAlterarNoticia = z.object({
@@ -67,9 +69,9 @@ export const SchemaAlterarNoticia = z.object({
   .min(10, { message: 'Titulo deve conter no máximo 10 caractéres' })   
   .max(50, { message: 'Titulo deve conter no máximo 50 caractéres' }),
     
-   tema: z
+  tema: z
   .string({ required_error: mensagens.campo })
-  .enum(['Educação','Segurança','Cultura','Saúde'], {message: 'Opção de tema invalido '}),
+  .enum(['Educação','Segurança','Cultura','Saúde']),
 
   dataLimite: z
   .date({required_error: mensagens.campo})
@@ -77,7 +79,7 @@ export const SchemaAlterarNoticia = z.object({
 
   status: z
   .string({ required_error: mensagens.campo })
-  .enum(['Ativo','Inativo'], {message: 'Opção de status invalido '}),
+  .enum(['Ativo','Inativo']),
   
   breveDescritivo: z
   .string({ required_error: mensagens.campo})
@@ -88,11 +90,13 @@ export const SchemaAlterarNoticia = z.object({
   .string({required_error: mensagens.campo})
   .url({message: 'Link com formato invalido'}),
 
-  // Falta Validar as imagens
+  imagem: z
+  .string({required_error: mensagens.campo})
+  .url({message: 'Link com formato invalido'}),
 })
 
 export const SchemaDeletarNoticia = z.object({
-  idComentario: idSchema,
+  idNoticia: idSchema,
 
   motivoRemocao: z
   .string({ required_error: mensagens.campo})
