@@ -8,10 +8,10 @@ const router = express.Router();
 router.get('/pesquisarNoticia', noticiaController.PesquisarNoticia)
 router.get('/visualizarNoticia/:id', noticiaController.VisualizarNoticia)
 
-router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), noticiaController.CriarNoticia)
+router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Publicar Noticia'), noticiaController.CriarNoticia)
 
-router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), noticiaController.AlterarNoticia)
+router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), noticiaController.AlterarNoticia)
 
-router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), noticiaController.DeletarNoticia)
+router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), noticiaController.DeletarNoticia)
 
 export default router;

@@ -11,10 +11,11 @@ export async function criarUsuario(req,res) {
             nome: req.body.nome,
             email: req.body.email,
             senha: req.body.senha,  
-            cpfUsuario: req.body.cpfUsuario
+            cpfUsuario: req.body.cpfUsuario,
+            telefone: req.body.telefone
         }
 
-        const { nome, email, senha, cpfUsuario } = validacaoUsuario.SchemaCriarUsuario.parse(data);
+        const { nome, email, senha, cpfUsuario, telefone } = validacaoUsuario.SchemaCriarUsuario.parse(data);
         
         const senhaCript = await bcrypt.hash(senha, 10);
         
@@ -24,9 +25,10 @@ export async function criarUsuario(req,res) {
             email_usuario,
             senha_usuario,
             cpf_usuario,
-            cargo_usuario ) 
+            cargo_usuario,
+            telefone_usuario ) 
             VALUES (?, ?, ?, ?, 'cidadao')`,
-            [nome, email, senhaCript, cpfUsuario]
+            [nome, email, senhaCript, cpfUsuario, telefone]
         );
 
         return res.status(201).json({ message: 'Usuario Cadastrado Com sucesso'})
@@ -44,7 +46,7 @@ export async function LogarUsuario(req,res) {
             senha: req.body.senha
         }
 
-        const { cpfUsuario, senha } = validacaoTransmissao.validacaoUsuario.parse(data);
+        const { cpfUsuario, senha } = validacaoUsuario.SchemaLogarUsuario.parse(data);
 
          const [resultado] = await db.query('SELECT * FROM Usuario WHERE cpf_usuario = ?', [cpfUsuario])
     
@@ -53,13 +55,17 @@ export async function LogarUsuario(req,res) {
          const usuario = resultado[0]
          
          const VerificarSenha = await bcrypt.compare(senha, usuario.senha_usuario)
-    
+         
          if (!VerificarSenha) return res.status(401).json({ message: 'Senha incorreta'})
+
+         const [resultadoPermissao] = await db.query('CALL VerPermissõesUsuario(?)', [usuario.id_usuario])
+
+         const permissoes = resultadoPermissao[0] || [];
         
          const token = jwt.sign(
-            { id: usuario.id_usuario, cargo: usuario.cargo_usuario}, 
+            { id: usuario.id_usuario, cargo: usuario.cargo_usuario, permissao: permissoes}, 
             JWT_SECRET, 
-            { expiresIn: '1h' }
+            { expiresIn: '2h' }
         );
     
         return res.json({token});

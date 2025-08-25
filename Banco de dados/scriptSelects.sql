@@ -36,7 +36,7 @@ DELIMITER ;
 
 DROP PROCEDURE IF EXISTS visualizarVotacaoEmAndamento;
 DELIMITER //
-CREATE PROCEDURE visualizarVotacaoEmAndamento(IN p_idVotacao INT)
+CREATE PROCEDURE visualizarVotacao(IN p_idVotacao INT)
 BEGIN
     SELECT 
         id_votacao,
@@ -45,36 +45,14 @@ BEGIN
         breveDescritivo_votacao,
         dataFim_votacao,
         anexos_votacao,
-        orçamento_votacao
-    FROM Votacao
-    WHERE id_votacao = p_idVotacao;
-
-    SELECT 
-        id_opcoesResposta,
-        titulo_opcaoResposta
-    FROM OpcoesResposta
-    WHERE id_votacao = p_idVotacao
-    ORDER BY qtVotos_opcaoResposta DESC;
-END //
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS visualizarVotacaoEncerrada;
-DELIMITER //
-CREATE PROCEDURE visualizarVotacaoEncerrada(IN p_idVotacao INT)
-BEGIN
-    SELECT 
-        id_votacao,
-        titulo_votacao,
-        tema_votacao,
-        dataFim_votacao,
-        anexos_votacao,
+        orçamento_votacao,
         resultado_votacao
     FROM Votacao
     WHERE id_votacao = p_idVotacao;
 
     SELECT 
         id_opcoesResposta,
-        titulo_opcaoResposta,
+        titulo_opcaoResposta
         qtVotos_opcaoResposta
     FROM OpcoesResposta
     WHERE id_votacao = p_idVotacao

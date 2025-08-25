@@ -45,11 +45,19 @@ export async function VisualizarUsuario(req,res) {
 
 export async function PromoverUsuario(req,res) {
   try{
-    const data = { cpfUsuario: req.params.cpf };
+    const data = {
+      nome: req.body.nome,
+      email: req.body.email,
+      senha: req.body.senha,  
+      cpf: req.body.cpf,
+      cargp: req.body.cargo,
+      secretaria: req.body.secretaria,
+      permissoes: req.body.permissoes
+  }
 
-    const { cpfUsuario } = validacaoGestor.SchemaPromoverUsuario.parse(data);
+    const { nome, email, senha, cpf, secretaria, permissoes } = validacaoUsuario.SchemaCriarUsuario.parse(data);
 
-    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',cpfUsuario])
+    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',cpf])
   
     return res.status(200).json({ message: 'Usuario promovido para Gestor Público'})
 

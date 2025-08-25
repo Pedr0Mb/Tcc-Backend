@@ -8,10 +8,10 @@ const router = express.Router();
 router.get('/pesquisarVotacao', votacaoController.PesquisarVotacoes)
 router.get('/visualizarVotacao/:id', votacaoController.VisualizarVotacao)
 
-router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), votacaoController.CriarVotacao)
+router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Publicar Votacao'), votacaoController.CriarVotacao)
 
-router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), votacaoController.AlterarVotacao)
+router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), votacaoController.AlterarVotacao)
 
-router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), votacaoController.DeletarVotacao)
+router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), votacaoController.DeletarVotacao)
 
 export default router;

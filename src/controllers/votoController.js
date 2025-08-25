@@ -2,23 +2,6 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoVotacao from '../validacoes/validacaoVotacao.js'
 
-export async function ListarVoto(req,res) {
-    try{
-        const [votos] = await db.query(
-          `SELECT id_voto, 
-          data_voto, 
-          id_usuario 
-          FROM Voto`
-        )
-
-        return res.status(200).json(votos)
-
-    }catch(erro){
-        console.error('Erro ao listar os votos:', erro)
-        res.status(500).json({ error: 'Erro interno ao listar votos'})
-    }
-}
-
 export async function RegistrarVoto(req,res) {
   try{
     const idUsuario = req.usuario.id

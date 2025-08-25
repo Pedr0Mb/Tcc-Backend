@@ -8,10 +8,10 @@ const router = express.Router();
 router.get('/pesquisarTransmissao', transmissaoController.PesquisarTransmissao)
 router.get('/visualizarTransmissao/:id', transmissaoController.VisualizarTransmissao)
 
-router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), transmissaoController.CriarTransmissao)
+router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Agendar Transmissao'), transmissaoController.CriarTransmissao)
 
-router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), transmissaoController.AlterarTransmissao)
+router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), transmissaoController.AlterarTransmissao)
 
-router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador'), transmissaoController.DeletarTransmissao)
+router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), transmissaoController.DeletarTransmissao)
 
 export default router;
