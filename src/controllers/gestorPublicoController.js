@@ -1,7 +1,7 @@
 import { db } from '../plugins/bd.js'
 import * as validacaoGestor from '../validacoes/validacaoGestor.js'
 
-export async function PesquisarUsuario(req,res) {
+export async function pesquisarUsuario(req,res) {
   try{
     const data = {
       nomeUsuario: req.query.nome || null,
@@ -25,11 +25,17 @@ export async function PesquisarUsuario(req,res) {
   }
 }
 
-export async function VisualizarUsuario(req,res) {
+export async function visualizarUsuario(req,res) {
   try{
-    const data = { idUsuario: Number(req.params.id) };
+    const data = { cpf: req.body.cpf };
 
-    const { idUsuario } = validacaoGestor.SchemaVisualizarUsuario.parse(data);
+    const { cpf } = validacaoGestor.SchemaVisualizarUsuario.parse(data);
+
+    const [usuarios] = await db.query('SELECT id_usuario FROM Usuario WHERE cpf_usuario = ?', [cpf])
+
+    if (usuarios.length === 0) return res.status(404).json({ message: 'Usuário não encontrado' })
+    
+    const idUsuario = usuarios[0].id_usuario
 
     const [resultado] = await db.query('CALL visualizarUsuario(?)', [idUsuario])
 
@@ -43,26 +49,39 @@ export async function VisualizarUsuario(req,res) {
   }
 }
 
-export async function PromoverUsuario(req,res) {
+export async function promoverUsuario(req,res) {
   try{
     const data = {
-      nome: req.body.nome,
-      email: req.body.email,
-      senha: req.body.senha,  
       cpf: req.body.cpf,
-      cargp: req.body.cargo,
+      cargo: req.body.cargo,
       secretaria: req.body.secretaria,
-      permissoes: req.body.permissoes
-  }
+      permissoes: req.body.permissoes 
+    }
 
-    const { nome, email, senha, cpf, secretaria, permissoes } = validacaoUsuario.SchemaCriarUsuario.parse(data);
+    const {cpf, cargo, secretaria, permissoes } = validacaoGestor.SchemaCriarUsuario.parse(data);
 
-    await db.query('UPDATE Usuario SET cargo_usuario = ? WHERE id_usuario = ?', ['GestorPublico',cpf])
-  
-    return res.status(200).json({ message: 'Usuario promovido para Gestor Público'})
+    await db.query(`
+      UPDATE Usuario 
+      SET cargo_usuario = ?,
+      secretaria_usuario = ?
+      WHERE cpf_usuario = ?`, [cargo , secretaria, cpf]);
+
+    const [usuarios] = await db.query('SELECT id_usuario FROM Usuario WHERE cpf_usuario = ?', [cpf]);
+
+    if (usuarios.length === 0) return res.status(404).json({ message: 'Usuário não encontrado' });
+    
+    const idUsuario = usuarios[0].id_usuario;
+
+    await db.query('DELETE FROM PermissaoUsuario WHERE id_usuario = ?', [idUsuario]);
+
+    const values = permissoes.map(permissao => [idUsuario, permissao]);
+
+    await db.query('INSERT INTO PermissaoUsuario (id_usuario, permissao) VALUES ?', [values]);
+
+    return res.status(200).json({ message: 'Usuario promovido'});
 
   }catch(erro){
     console.error('Erro ao promover usuario: ',erro)
-    return res.status(500).send({ error: 'Erro ao promever o usuario'})
+    return res.status(500).send({ error: 'Erro ao promover o usuario'})
   }
 }

@@ -5,9 +5,8 @@ import { verificarPermissao } from '../middlewares/verificarPermissao.js';
 
 const router = express.Router();
 
-router.get('/pesquisarUsuario', autenticarToken, verificarPermissao('Administrador'), gestorController.PesquisarUsuario)
-router.get('/visualizarUsuario/:id', autenticarToken, verificarPermissao('Administrador'), gestorController.VisualizarUsuario)
-
-router.patch('/promoverUsuario/:id', autenticarToken, verificarPermissao('Administrador'), gestorController.PromoverUsuario)
+router.get('/pesquisarUsuario', autenticarToken, verificarPermissao('Administrador'), gestorController.pesquisarUsuario)
+router.get('/visualizarUsuario', autenticarToken, verificarPermissao('Administrador'), gestorController.visualizarUsuario)
+router.patch('/promoverUsuario', autenticarToken, verificarPermissao('Administrador'), gestorController.promoverUsuario)
 
 export default router;

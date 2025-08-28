@@ -4,13 +4,13 @@ import { autenticarToken } from '../middlewares/autenticarToken.js';
 
 const router = express.Router();
 
-router.get('/pesquisarPauta', pautaController.PesquisarPauta)
-router.get('/visualizarPauta/:id', pautaController.VisualizarPauta)
+router.get('/pesquisarPauta', pautaController.pesquisarPauta)
+router.get('/visualizarPauta/:id', pautaController.visualizarPauta)
 
-router.post('/', autenticarToken, pautaController.CriarPauta)
+router.post('/', autenticarToken, pautaController.criarPauta)
 
-router.patch('/', autenticarToken, pautaController.AlterarPauta)
+router.patch('/', autenticarToken, pautaController.alterarPauta)
 
-router.delete('/', autenticarToken, pautaController.DeletarPauta)
+router.delete('/', autenticarToken, pautaController.deletarPauta)
 
 export default router;

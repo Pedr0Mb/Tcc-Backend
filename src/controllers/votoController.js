@@ -2,7 +2,7 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoVotacao from '../validacoes/validacaoVotacao.js'
 
-export async function RegistrarVoto(req,res) {
+export async function registrarVoto(req,res) {
   try{
     const idUsuario = req.usuario.id
 

@@ -16,7 +16,7 @@ export const SchemaPesquisarUsuario = z.object({
     .nullable()
     .optional(),
 
-     cpfUsuario: z
+    cpfUsuario: z
     .string({ required_error: mensagens.campo })
     .length(11, { message: "CPF deve conter 11 digitos" })
     .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" })
@@ -28,14 +28,6 @@ export const SchemaPesquisarUsuario = z.object({
     .enum(['Administrador','Gestor','cidadao'])
     .nullable()
     .optional(),
-
-    secretaria: z
-    .string({ required_error: mensagens.campo })
-    .enum(['Educação','Segurança','Cultura','Saúde']),
-
-    permissao: z
-    .string({ required_error: mensagens.campo })
-    .enum(['Publicar Noticia', 'Agendar Transmissao', 'Criar Votacao', 'Moderar Conteudo']),
 })
 
 export const SchemaVisualizarUsuario = z.object({
@@ -43,31 +35,20 @@ export const SchemaVisualizarUsuario = z.object({
 })
 
 export const SchemaPromoverUsuario = z.object({
-  nome: z
-  .string({ required_error: mensagens.campo })
-  .max(150, { message: 'Nome deve conter no máximo 150 caractéres'}),
-  
-  email: z
-  .string({ required_error: mensagens.campo })
-  .email({ message: 'Email com formato inválido' })   
-  .max(256, { message: 'Email deve conter no máximo 256 caractéres'}),
-
-  senha: z
-  .string({required_error: mensagens.campo})
-  .min(6,{message: 'Senha deve ter no mínimo 6 caractéres'}),
-
-  cpf: z
+  cpfUsuario: z
   .string({ required_error: mensagens.campo })
   .length(11, { message: "CPF deve conter 11 digitos" })
-  .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" })
-  .nullable()
-  .optional(),
+  .regex(/^\d{11}$/, { message: "CPF deve conter apenas números" }),
 
   cargoUsuario: z
-    .string({ required_error: mensagens.campo })
-    .enum(['Administrador','Gestor','cidadao'])
-    .nullable()
-    .optional(),
+  .string({ required_error: mensagens.campo })
+  .enum(['Administrador','Gestor','cidadao']),
 
+  secretaria: z
+  .string({ required_error: mensagens.campo })
+  .enum(['Educação','Segurança','Cultura','Saúde']),
+
+  permissao: z
+  .array(z.enum(['Publicar Noticia', 'Agendar Transmissao', 'Criar Votacao', 'Moderar Conteudo'])),
 })
 

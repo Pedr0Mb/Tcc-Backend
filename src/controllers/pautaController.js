@@ -2,7 +2,7 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoPauta from '../validacoes/validacaoPauta.js'
 
-export async function PesquisarPauta(req,res) {  
+export async function pesquisarPauta(req,res) {  
   try{
     const data = {
       titulo: req.query.titulo || null,
@@ -25,7 +25,7 @@ export async function PesquisarPauta(req,res) {
   }
 }
 
-export async function VisualizarPauta(req, res) {
+export async function visualizarPauta(req, res) {
   try {
     const data = { idPauta: Number(req.params.id) }
 
@@ -45,7 +45,7 @@ export async function VisualizarPauta(req, res) {
 }
 
 
-export async function CriarPauta(req,res) {  
+export async function criarPauta(req,res) {  
   try{
       const idUsuario = req.usuario.id
       const data = {
@@ -80,7 +80,7 @@ export async function CriarPauta(req,res) {
     }
 }
 
-export async function AlterarPauta(req,res) {
+export async function alterarPauta(req,res) {
   try{
   const idUsuario = req.usuario.id
 
@@ -126,7 +126,7 @@ export async function AlterarPauta(req,res) {
     }
 }
 
-export async function DeletarPauta(req,res) {
+export async function deletarPauta(req,res) {
   try{
     const idUsuario = req.usuario.id
 

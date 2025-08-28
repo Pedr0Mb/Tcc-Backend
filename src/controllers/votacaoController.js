@@ -2,7 +2,7 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoVotacao from '../validacoes/validacaoVotacao.js'
 
-export async function PesquisarVotacoes(req,res) {
+export async function pesquisarVotacoes(req,res) {
   try{
     const data = {
       status: req.query.status || null,
@@ -26,7 +26,7 @@ export async function PesquisarVotacoes(req,res) {
   }
 }
 
-export async function VisualizarVotacao(req, res) {
+export async function visualizarVotacao(req, res) {
   const id = req.params.id;
 
   try {
@@ -44,7 +44,7 @@ export async function VisualizarVotacao(req, res) {
 }
 
 
-export async function CriarVotacao(req,res) {
+export async function criarVotacao(req,res) {
   try{
     const idGestor = req.usuario.id
 
@@ -101,7 +101,7 @@ export async function CriarVotacao(req,res) {
   }
 }
     
-export async function AlterarVotacao(req, res) {
+export async function alterarVotacao(req, res) {
   try {
     const idGestor = req.usuario.id;
     const data = {
@@ -156,7 +156,7 @@ export async function AlterarVotacao(req, res) {
   }
 }
     
-export async function DeletarVotacao(req,res) {
+export async function deletarVotacao(req,res) {
   try{
     const idGestor = req.usuario.id
 

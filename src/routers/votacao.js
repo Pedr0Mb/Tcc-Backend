@@ -5,13 +5,13 @@ import { verificarPermissao } from '../middlewares/verificarPermissao.js';
 
 const router = express.Router();
 
-router.get('/pesquisarVotacao', votacaoController.PesquisarVotacoes)
-router.get('/visualizarVotacao/:id', votacaoController.VisualizarVotacao)
+router.get('/pesquisarVotacao', votacaoController.pesquisarVotacoes)
+router.get('/visualizarVotacao/:id', votacaoController.visualizarVotacao)
 
-router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Publicar Votacao'), votacaoController.CriarVotacao)
+router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Publicar Votacao'), votacaoController.criarVotacao)
 
-router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), votacaoController.AlterarVotacao)
+router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), votacaoController.alterarVotacao)
 
-router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), votacaoController.DeletarVotacao)
+router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), votacaoController.deletarVotacao)
 
 export default router;

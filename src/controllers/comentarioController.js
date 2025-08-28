@@ -2,7 +2,7 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoComentario from '../validacoes/validacaoComentario.js'
 
-export async function VisualizarComentario(req, res) {
+export async function visualizarComentario(req, res) {
     try {
         const data = { idComentario: Number(req.query.id) };
 
@@ -22,7 +22,7 @@ export async function VisualizarComentario(req, res) {
   }
 }
 
-export async function CriarComentario(req,res) {
+export async function criarComentario(req,res) {
     try{
         const idUsuario = req.usuario.id;
 
@@ -53,7 +53,7 @@ export async function CriarComentario(req,res) {
     }
 }
 
-export async function AlterarComentario(req,res) {
+export async function alterarComentario(req,res) {
     try{
         const idUsuario = req.usuario.id
 
@@ -80,7 +80,7 @@ export async function AlterarComentario(req,res) {
     }
 }
 
-export async function DeletarComentario(req,res) {
+export async function deletarComentario(req,res) {
     try{
         const idUsuario = req.usuario.id
         

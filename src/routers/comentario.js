@@ -4,12 +4,12 @@ import { autenticarToken } from '../middlewares/autenticarToken.js';
 
 const router = express.Router();
 
-router.get('/visualizarComentario', comentarioController.VisualizarComentario)
+router.get('/visualizarComentario', comentarioController.visualizarComentario)
 
-router.post('/', autenticarToken, comentarioController.CriarComentario)
+router.post('/', autenticarToken, comentarioController.criarComentario)
 
-router.patch('/', autenticarToken, comentarioController.AlterarComentario)
+router.patch('/', autenticarToken, comentarioController.alterarComentario)
 
-router.delete('/', autenticarToken, comentarioController.DeletarComentario)
+router.delete('/', autenticarToken, comentarioController.deletarComentario)
 
 export default router;

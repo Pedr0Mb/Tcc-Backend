@@ -27,7 +27,7 @@ export async function criarUsuario(req,res) {
             cpf_usuario,
             cargo_usuario,
             telefone_usuario ) 
-            VALUES (?, ?, ?, ?, 'cidadao')`,
+            VALUES (?, ?, ?, ?, 'cidadao',?)`,
             [nome, email, senhaCript, cpfUsuario, telefone]
         );
 
@@ -39,7 +39,7 @@ export async function criarUsuario(req,res) {
     }
 }
 
-export async function LogarUsuario(req,res) {
+export async function logarUsuario(req,res) {
     try{
         const data = {
             cpfUsuario: req.body.cpfUsuario,
@@ -76,13 +76,15 @@ export async function LogarUsuario(req,res) {
     }
 }
 
-export async function VerMeuUsaurio(req,res) {
+export async function verMeuUsaurio(req,res) {
     try{
         const id = req.usuario.id
 
         const [resultado] = await db.query('CALL visualizarUsuario(?)',[id])
 
         const usuario = resultado[0] 
+
+        if(!usuario) return res.status(404).json({ message: 'Usuario não encontrado'})
   
         return res.status(200).json(usuario)
 

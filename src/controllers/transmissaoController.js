@@ -2,7 +2,7 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoTransmissao from '../validacoes/validacaoTransmissao.js'
 
-export async function PesquisarTransmissao(req,res) {
+export async function pesquisarTransmissao(req,res) {
   try{
     const data = {
       titulo: req.query.titulo || null,
@@ -25,7 +25,7 @@ export async function PesquisarTransmissao(req,res) {
   }
 }
 
-export async function VisualizarTransmissao(req,res) {
+export async function visualizarTransmissao(req,res) {
   try{
     const data = { id: Number(req.params.id) }
 
@@ -43,7 +43,7 @@ export async function VisualizarTransmissao(req,res) {
   }
 }
 
-export async function CriarTransmissao(req,res) {
+export async function criarTransmissao(req,res) {
   try{
       const idGestor = req.usuario.id
 
@@ -84,7 +84,7 @@ export async function CriarTransmissao(req,res) {
     }
 }
 
-export async function AlterarTransmissao(req,res) {
+export async function alterarTransmissao(req,res) {
   try{
       const idGestor = req.usuario.id
 
@@ -124,7 +124,7 @@ export async function AlterarTransmissao(req,res) {
       }
     }
     
-    export async function DeletarTransmissao(req,res) {
+    export async function deletarTransmissao(req,res) {
       try{
         const idGestor = req.usuario.id
 

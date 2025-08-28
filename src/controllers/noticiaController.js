@@ -2,7 +2,7 @@ import { db } from '../plugins/bd.js'
 import { registrarAtividade } from '../utils/registroAtividade.js'
 import * as validacaoNoticia from '../validacoes/validacaoNoticia.js'
 
-export async function PesquisarNoticia(req,res) {
+export async function pesquisarNoticia(req,res) {
   try{
     const data = {
       titulo: req.query.titulo || null,
@@ -26,7 +26,7 @@ export async function PesquisarNoticia(req,res) {
   }
 }
 
-export async function VisualizarNoticia(req,res) {
+export async function visualizarNoticia(req,res) {
   try{
     const data = { idNoticia: Number(req.params.id) }
 
@@ -44,7 +44,7 @@ export async function VisualizarNoticia(req,res) {
   }
 }
 
-export async function CriarNoticia(req,res) {
+export async function criarNoticia(req,res) {
   try{
   const idGestor = req.usuario.id
    
@@ -84,7 +84,7 @@ export async function CriarNoticia(req,res) {
   }
 }
     
-export async function AlterarNoticia(req,res) {
+export async function alterarNoticia(req,res) {
   try{
     const idGestor = req.usuario.id
     
@@ -123,7 +123,7 @@ export async function AlterarNoticia(req,res) {
     }
 }
       
-export async function DeletarNoticia(req,res) {
+export async function deletarNoticia(req,res) {
   try{
     const idGestor = req.usuario.id
 

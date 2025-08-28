@@ -1,9 +1,12 @@
 export function verificarPermissao(...rolesPermitidos) {
   return (req, res, next) => {
     const cargo = req.usuario.cargo;
-    const permissoes = req.usuario.permissoes
+    const permissoes = req.usuario.permissoes || [];
 
-    if (!rolesPermitidos.includes(cargo) || !rolesPermitidos.includes(permissoes)) {
+    const temCargo = rolesPermitidos.includes(cargo);
+    const temPermissao = permissoes.some(p => rolesPermitidos.includes(p));
+
+    if (!temCargo && !temPermissao) {
       return res.status(403).json({ mensagem: 'Acesso negado: permissão insuficiente' });
     }
 

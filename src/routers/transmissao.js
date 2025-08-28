@@ -5,13 +5,13 @@ import { verificarPermissao } from '../middlewares/verificarPermissao.js';
 
 const router = express.Router();
 
-router.get('/pesquisarTransmissao', transmissaoController.PesquisarTransmissao)
-router.get('/visualizarTransmissao/:id', transmissaoController.VisualizarTransmissao)
+router.get('/pesquisarTransmissao', transmissaoController.pesquisarTransmissao)
+router.get('/visualizarTransmissao/:id', transmissaoController.visualizarTransmissao)
 
-router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Agendar Transmissao'), transmissaoController.CriarTransmissao)
+router.post('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Agendar Transmissao'), transmissaoController.criarTransmissao)
 
-router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), transmissaoController.AlterarTransmissao)
+router.patch('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), transmissaoController.alterarTransmissao)
 
-router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), transmissaoController.DeletarTransmissao)
+router.delete('/', autenticarToken, verificarPermissao('GestorPublico','Administrador', 'Moderar Conteudo'), transmissaoController.deletarTransmissao)
 
 export default router;
