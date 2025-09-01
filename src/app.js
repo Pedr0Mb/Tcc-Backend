@@ -1,6 +1,6 @@
 import express from 'express'
 import usuariosRoutes from './routers/usuario.js'
-import gestorRoutes from './routers/gestorPublico.js'
+import adiministradorRoutes from './routers/administrador.js'
 import noticiaRoutes from './routers/noticias.js'
 import transmissaoRoutes from './routers/transmissao.js'
 import pautaRoutes from './routers/pauta.js'
@@ -14,7 +14,7 @@ const app = express()
 app.use(express.json())
 
 app.use('/usuario', usuariosRoutes);
-app.use('/gestor', gestorRoutes);
+app.use('/gestor', adiministradorRoutes);
 app.use('/noticias', noticiaRoutes)
 app.use('/transmissao', transmissaoRoutes)
 app.use('/pauta', pautaRoutes)

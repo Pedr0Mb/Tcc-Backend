@@ -7,11 +7,11 @@ POST {{host}}/usuario
 Content-Type: application/json
 
 {
-"nome": "João Silva",
+"nome": "Pedro Molina",
+"email": "joao@example.com",
 "senha": "senha123",
 "cpf": "12345678901",
-"email": "joao@example.com",
-"nivel": "cidadao"
+"telefone": "13981911591"
 }
 
 ### 2. Fazer login (recebe token)
@@ -29,40 +29,36 @@ Content-Type: application/json
 GET {{host}}/usuario
 Authorization: Bearer {{token}}
 
-### 4. Listar usuários
+### 4. Pesquisar usuário
 
-GET {{host}}/gestor
+GET {{host}}/gestor/pesquisarUsuario?nome=Pedro&cpf=12345678901&cargo=Cidadao
 Authorization: Bearer {{token}}
 
-### 5. Pesquisar usuário
-
-GET {{host}}/gestor/pesquisarUsuario?nmUsuario=João\&cpfUsuario=\&funcaoUsuario=
-Authorization: Bearer {{token}}
-
-### 6. Visualizar usuário
+### 5. Visualizar usuário
 
 GET {{host}}/gestor/visualizarUsuario/1
 Authorization: Bearer {{token}}
 
-### 7. Promover usuário
+### 6. Promover usuário
 
 PATCH {{host}}/gestor/promoverUsuario/1
 Authorization: Bearer {{token}}
+Content-Type: application/json
 
-### 8. Listar notícias
-
-GET {{host}}/noticias
-Authorization: Bearer {{token}}
+{
+"cpf": "12345678601",
+"cargo": "Gerenciador",
+"secretaria": "Educação",
+"permissao": ["Publicar Noticia", "Moderar Conteudo"]
+}
 
 ### 9. Pesquisar notícias
 
-GET {{host}}/noticias/pesquisarNoticia?idGestor=4
-Authorization: Bearer {{token}}
+GET {{host}}/noticias/pesquisarNoticia?titulo=Evento&tema=Educação&status=Ativo
 
 ### 10. Visualizar notícia
 
 GET {{host}}/noticias/visualizarNoticia/1
-Authorization: Bearer {{token}}
 
 ### 11. Criar notícia
 
@@ -71,10 +67,12 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-"titulo": "Novo Evento",
-"corpo": "Detalhes do evento...",
+"titulo": "Evento",
+"tema": "Educação",
+"dataLimite": "2025-10-25",
+"breveDescritivo": "Um evento sobre educação",
 "link": "http://evento.com",
-"midia": "http://evento.com/imagem.jpg"
+"imagem": "http://evento.com/imagem.jpg"
 }
 
 ### 12. Alterar notícia
@@ -85,10 +83,13 @@ Content-Type: application/json
 
 {
 "id": 1,
-"titulo": "Evento Atualizado",
-"corpo": "Novos detalhes...",
-"link": "http://evento.com/atualizado",
-"midia": "http://evento.com/imagem2.jpg"
+"titulo": "Evento",
+"tema": "Educação",
+"status": "Ativo",
+"dataLimite": "2025-10-25",
+"breveDescritivo": "Um evento sobre educação",
+"link": "http://evento.com",
+"imagem": "http://evento.com/imagem.jpg"
 }
 
 ### 13. Deletar notícia (body)
@@ -101,6 +102,8 @@ Content-Type: application/json
 "id": 1,
 "motivoRemocao": "Conteúdo obsoleto"
 }
+
+# Terminar de corrigir daqui pra baixo
 
 ### 14. Listar transmissões
 

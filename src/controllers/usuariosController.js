@@ -2,8 +2,10 @@ import { db } from '../plugins/bd.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import * as validacaoUsuario from '../validacoes/validacaoUsuario.js'
+import dotenv from 'dotenv';
+dotenv.config();
 
-const JWT_SECRET = 'chave'
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function criarUsuario(req,res) {
     try{
@@ -27,7 +29,7 @@ export async function criarUsuario(req,res) {
             cpf_usuario,
             cargo_usuario,
             telefone_usuario ) 
-            VALUES (?, ?, ?, ?, 'cidadao',?)`,
+            VALUES (?, ?, ?, ?, 'Cidadao',?)`,
             [nome, email, senhaCript, cpfUsuario, telefone]
         );
 
@@ -42,13 +44,13 @@ export async function criarUsuario(req,res) {
 export async function logarUsuario(req,res) {
     try{
         const data = {
-            cpfUsuario: req.body.cpfUsuario,
+            cpf: req.body.cpfUsuario,
             senha: req.body.senha
         }
 
-        const { cpfUsuario, senha } = validacaoUsuario.SchemaLogarUsuario.parse(data);
+        const { cpf, senha } = validacaoUsuario.SchemaLogarUsuario.parse(data);
 
-         const [resultado] = await db.query('SELECT * FROM Usuario WHERE cpf_usuario = ?', [cpfUsuario])
+         const [resultado] = await db.query('SELECT * FROM Usuario WHERE cpf_usuario = ?', [cpf])
     
         if (resultado.length === 0) return res.status(404).json({ message: 'Usuário não encontrado'});
     
@@ -70,13 +72,13 @@ export async function logarUsuario(req,res) {
     
         return res.json({token});
 
-    }catch(erro){
-        console.error('Erro ao logar Usuario: ',erro)
+    }catch(error){
+        console.error('Erro ao logar Usuario: ',error)
         return res.status(500).json({ error: 'Erro interno ao logar Usuario'})
     }
 }
 
-export async function verMeuUsaurio(req,res) {
+export async function verUsaurio(req,res) {
     try{
         const id = req.usuario.id
 
@@ -88,8 +90,32 @@ export async function verMeuUsaurio(req,res) {
   
         return res.status(200).json(usuario)
 
-    }catch(erro){
-        console.error('Erro ao Visualizar Usuario: ',erro)
+    }catch(error){
+        console.error('Erro ao Visualizar Usuario: ',error)
         return res.status(400).json({ error: 'Erro interno ao visualizar o Usuario'})
+    }
+}
+
+export async function verHistorico(req,res) {
+    try {
+        const id = req.usuario.id
+
+        const data = {
+            dataInicio: new Date(req.body.dataInicio),
+            tipoAtividade: req.body.tipoAtividade
+        }
+        
+        const { dataInicio, tipoAtividade  } = validacaoUsuario.SchemaVerHistorico.parse(data)
+
+        const [resultado] = await db.query('CALL visualizarHistorico(?.?,?)',[id, dataInicio, tipoAtividade])
+
+        const historico = resultado[0]
+
+        if(!historico) return res.status(404).json({ message: 'Historico vazio'})
+
+        return res.status(200).json(historico)
+    } catch (error) {
+        console.error('Erro ao visualizar o Historico: ',error)
+        return res.status(400).json({ error: 'Erro interno ao visualizar o Historico'})
     }
 }

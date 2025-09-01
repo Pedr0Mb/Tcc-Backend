@@ -5,8 +5,8 @@ import * as validacaoPauta from '../validacoes/validacaoPauta.js'
 export async function pesquisarPauta(req,res) {  
   try{
     const data = {
-      titulo: req.query.titulo || null,
-      status: req.query.status || null
+      titulo: req.body.titulo || null,
+      status: req.body.status || null
     }
 
     const { titulo, status } = validacaoPauta.SchemaPesquisarPauta.parse(data)
@@ -19,8 +19,8 @@ export async function pesquisarPauta(req,res) {
     
     return res.status(200).json(pautas)
 
-  }catch(erro){
-    console.error('Erro ao pesquisar pauta: ',erro)
+  }catch(error){
+    console.error('Erro ao pesquisar pauta: ',error)
     return res.status(500).json({ error: 'Erro interno ao pesquisar Pauta'})
   }
 }
@@ -38,8 +38,8 @@ export async function visualizarPauta(req, res) {
 
     return res.status(200).json({pauta,comentarios});
 
-  } catch (erro) {
-    console.error('Erro ao visualizar pauta: ', erro);
+  } catch (error) {
+    console.error('Erro ao visualizar pauta: ', error);
     return res.status(500).json({ error: 'Erro interno ao visualizar a pauta' });
   }
 }
@@ -74,8 +74,8 @@ export async function criarPauta(req,res) {
         await registrarAtividade('pauta_criada', 'Pauta criada', null, idUsuario)
         return res.status(201).json({ message: 'Pauta criada com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao criar pauta: ',erro)
+    }catch(error){
+        console.error('Erro ao criar pauta: ',error)
         return res.status(500).json({ error: 'Erro interno ao criar pauta'})
     }
 }
@@ -85,7 +85,7 @@ export async function alterarPauta(req,res) {
   const idUsuario = req.usuario.id
 
   const data = {
-    idPauta: Number(req.params.id),
+    idPauta: Number(req.body.id),
     titulo: req.body.titulo,
     descricao: req.body.descricao,
     justificativa: req.body.justificativa,
@@ -120,8 +120,8 @@ export async function alterarPauta(req,res) {
         await registrarAtividade('pauta_alterada', 'Pauta alterada', null, idUsuario)
         return res.status(200).json({ message: 'Pauta atualizada com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao atualizar Pauta: ',erro)
+    }catch(error){
+        console.error('Erro ao atualizar Pauta: ',error)
         return res.status(500).json({ error: 'Erro interno ao atualizar Pauta'})
     }
 }
@@ -131,7 +131,7 @@ export async function deletarPauta(req,res) {
     const idUsuario = req.usuario.id
 
     const data = {
-      idPauta: Number(req.params.id),
+      idPauta: Number(req.body.id),
       motivoRemocao: req.body.motivoRemocao
     }
 
@@ -152,8 +152,8 @@ export async function deletarPauta(req,res) {
 
     return res.status(200).json({ message: 'Pauta deletada com sucesso'})
 
-  }catch(erro){
-      console.error('Erro ao atualizar Pauta: ',erro)
+  }catch(error){
+      console.error('Erro ao atualizar Pauta: ',error)
       return res.status(500).json({ error: 'Erro interno ao deletar Pauta'})
   }
 }

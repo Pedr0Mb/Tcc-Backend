@@ -72,14 +72,15 @@ CREATE TABLE Voto (
   FOREIGN KEY (id_opcoesResposta) REFERENCES OpcoesResposta(id_opcoesResposta) ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS ResgistroAtividade;
+DROP TABLE IF EXISTS RegistroAtividade;
 CREATE TABLE RegistroAtividade (
   id_registroAtividade INT NOT NULL AUTO_INCREMENT,
   tipo_atividade VARCHAR(50) NOT NULL,
-  descricao_atividade VARCHAR(256),
+  titulo_atividade VARCHAR(256),
   link_atividade TEXT,
   date_atividade DATETIME NOT NULL,
   id_usuario INT NOT NULL,
+  id_atividade INT,
   PRIMARY KEY (id_registroAtividade),
   FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );

@@ -20,26 +20,26 @@ export async function pesquisarNoticia(req,res) {
     
     return res.status(200).json(noticias)
 
-  }catch(erro){
-    console.error('Erro ao pesquisar noticia: ',erro)
+  }catch(error){
+    console.error('Erro ao pesquisar noticia: ',error)
     return res.status(500).json({ error: 'Erro ao pesquisar noticia'})
   }
 }
 
 export async function visualizarNoticia(req,res) {
   try{
-    const data = { idNoticia: Number(req.params.id) }
+    const data = { id: Number(req.params.id) }
 
-    const { idNoticia } = validacaoNoticia.SchemaVisualizarNoticia.parse(data);
+    const { id } = validacaoNoticia.SchemaVisualizarNoticia.parse(data);
 
-    const [resultado] = await db.query('CALL visualizarNoticia(?)', [idNoticia])
+    const [resultado] = await db.query('CALL visualizarNoticia(?)', [id])
     
     const noticia = resultado[0] || [];
    
     return res.status(200).json(noticia)
 
-  }catch(erro){
-    console.error('Erro ao visualizar noticia: ',erro)
+  }catch(error){
+    console.error('Erro ao visualizar noticia: ',error)
     return res.status(500).json({ error: 'Erro ao visualizar o noticia'})
   }
 }
@@ -59,7 +59,7 @@ export async function criarNoticia(req,res) {
 
   const { titulo, tema, dataLimite, breveDescritivo, link, imagem } = validacaoNoticia.SchemaCriarNoticia.parse(data);
   
-  await db.query(
+  const [result] = await db.query(
       `INSERT INTO Noticia (
       titulo_noticia,
       tema_noticia,
@@ -70,16 +70,23 @@ export async function criarNoticia(req,res) {
       link_noticia,
       imagem_noticia,
       id_usuario ) 
-      VALUES (?,?, NOW(), ?, 'Ativa', ?, ?, ?, ?)`,
+      VALUES (?,?, NOW(), ?, 'Ativo', ?, ?, ?, ?)`,
       [titulo, tema, dataLimite, breveDescritivo, link, imagem, idGestor]
   );
-    
-    await registrarAtividade('noticia_criada','Noticia criada',null,idGestor)
+  const idNoticia = result.insertId;
+
+  await registrarAtividade({
+    tipo: 'Noticia',
+    titulo: 'Notícia criada',
+    link: null,
+    idUsuario: idGestor,
+    idAtividade: idNoticia,
+  });
+
+  return res.status(201).json({ message: 'Noticia criada com sucesso'})
         
-    return res.status(201).json({ message: 'Noticia criada com sucesso'})
-        
-  }catch(erro){
-    console.error('Erro ao criar noticia: ',erro)
+  }catch(error){
+    console.error('Erro ao criar noticia: ',error)
     return res.status(500).json({ error: 'Erro ao criar noticia'})
   }
 }
@@ -111,14 +118,19 @@ export async function alterarNoticia(req,res) {
       imagem_noticia = ?
       WHERE id_noticia = ?`
       , [titulo, tema, dataLimite, status, breveDescritivo, link, imagem, idNoticia]
-    )
-          
-    await registrarAtividade('noticia_alterada','Noticia alterada',null,idGestor)
-          
+    );
+    await registrarAtividade({
+      tipo: 'noticia_alterada',
+      titulo: 'Notícia alterada',
+      link: null,
+      idUsuario: idGestor,
+      idAtividade: idNoticia,
+      tipoEntidade: 'Noticia'
+    });
     return res.status(200).json({ message: 'Noticia atualizada com sucesso'})
           
-    }catch(erro){
-      console.error('Erro ao atualizar noticia: ',erro)
+    }catch(error){
+      console.error('Erro ao atualizar noticia: ',error)
       return res.status(500).json({ error: 'Erro ao atualizar noticia'})
     }
 }
@@ -128,20 +140,25 @@ export async function deletarNoticia(req,res) {
     const idGestor = req.usuario.id
 
     const data = { 
-      idNoticia: Number(req.params.id), 
+      idNoticia: Number(req.body.id), 
       motivoRemocao: req.body.motivoRemocao 
     };
 
     const { idNoticia, motivoRemocao } = validacaoNoticia.SchemaDeletarNoticia.parse(data);
 
-    await db.query('DELETE FROM Noticia WHERE id_noticia = ?', [idNoticia])
-
-    await registrarAtividade('noticia_removida',motivoRemocao,null,idGestor)
-
+    await db.query('DELETE FROM Noticia WHERE id_noticia = ?', [idNoticia]);
+    await registrarAtividade({
+      tipo: 'noticia_removida',
+      titulo: motivoRemocao,
+      link: null,
+      idUsuario: idGestor,
+      idAtividade: idNoticia,
+      tipoEntidade: 'Noticia'
+    });
     return res.status(200).json({ message: 'Noticia deletada com sucesso'})
 
-  }catch(erro){
-    console.error('Erro ao deletar noticia: ',erro)
+  }catch(error){
+    console.error('Erro ao deletar noticia: ',error)
     return res.status(500).json({ error: 'Erro ao deletar noticia'})
   }
 }

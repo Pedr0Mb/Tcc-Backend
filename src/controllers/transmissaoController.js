@@ -5,8 +5,8 @@ import * as validacaoTransmissao from '../validacoes/validacaoTransmissao.js'
 export async function pesquisarTransmissao(req,res) {
   try{
     const data = {
-      titulo: req.query.titulo || null,
-      status: req.query.status || null
+      titulo: req.body.titulo || null,
+      status: req.body.status || null
     }
 
     const { titulo, status } = validacaoTransmissao.SchemaPesquisarTransmissao.parse(data)
@@ -19,8 +19,8 @@ export async function pesquisarTransmissao(req,res) {
   
     return res.status(201).json(transmissoes)
 
-  }catch(erro){
-    console.error('Erro ao pesquisar Transmissao: ',erro)
+  }catch(error){
+    console.error('Erro ao pesquisar Transmissao: ',error)
     return res.status(500).json({ error: 'Erro ao pesquisar Transmissao'})
   }
 }
@@ -37,8 +37,8 @@ export async function visualizarTransmissao(req,res) {
   
     return res.status(201).json(transmissao)
 
-  }catch(erro){
-    console.error('Erro ao visualizar Transmissao: ',erro)
+  }catch(error){
+    console.error('Erro ao visualizar Transmissao: ',error)
     return res.status(500).json({ error: 'Erro ao visualizar o Transmissao'})
   }
 }
@@ -78,8 +78,8 @@ export async function criarTransmissao(req,res) {
 
         return res.status(201).json({ message: 'Transmissao criada com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao criar Transmissao: ',erro)
+    }catch(error){
+        console.error('Erro ao criar Transmissao: ',error)
         return res.status(500).json({ error: 'Erro ao criar Transmissao'})
     }
 }
@@ -89,7 +89,7 @@ export async function alterarTransmissao(req,res) {
       const idGestor = req.usuario.id
 
       const data = {
-        idTransmissao: Number(req.params.id),
+        idTransmissao: Number(req.body.id),
         titulo: req.body.titulo,
         subTitulo: req.body.subTitulo,
         status: req.body.status,
@@ -118,8 +118,8 @@ export async function alterarTransmissao(req,res) {
         
         return res.status(201).json({ message: 'Transmissao atualizada com sucesso'})
         
-      }catch(erro){
-        console.error('Erro ao atualizar Transmissao: ',erro)
+      }catch(error){
+        console.error('Erro ao atualizar Transmissao: ',error)
         return res.status(500).json({ error: 'Erro ao atualizar Transmissao'})
       }
     }
@@ -129,7 +129,7 @@ export async function alterarTransmissao(req,res) {
         const idGestor = req.usuario.id
 
         const data = { 
-          id: Number(req.params.id), 
+          id: Number(req.body.id), 
           motivoRemocao: req.body.motivoRemocao 
         }
 
@@ -141,8 +141,8 @@ export async function alterarTransmissao(req,res) {
 
         return res.status(201).json({ message: 'Transmissao deletada com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao deletar Transmissao: ',erro)
+    }catch(error){
+        console.error('Erro ao deletar Transmissao: ',error)
         return res.status(500).json({ error: 'Erro ao deletar Transmissao'})
     }
 }

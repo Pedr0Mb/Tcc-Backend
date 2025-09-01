@@ -13,7 +13,8 @@ BEGIN
         nm_usuario,
         cpf_usuario,
         email_usuario,
-        cargo_usuario
+        cargo_usuario,
+        telefone_usuario
     FROM Usuario
     WHERE (nomeUsuario   IS NULL OR nm_usuario   LIKE CONCAT('%', nomeUsuario, '%'))
       AND (cpfUsuario    IS NULL OR cpf_usuario   = cpfUsuario)
@@ -34,7 +35,7 @@ DELIMITER ;
 
 /* Votações */
 
-DROP PROCEDURE IF EXISTS visualizarVotacaoEmAndamento;
+DROP PROCEDURE IF EXISTS visualizarVotacao;
 DELIMITER //
 CREATE PROCEDURE visualizarVotacao(IN p_idVotacao INT)
 BEGIN
@@ -185,9 +186,11 @@ CREATE PROCEDURE visualizarHistorico(
 )
 BEGIN
     SELECT 
+        id_registroAtividade,
+        id_atividade,
         date_atividade,
         tipo_atividade,
-        descricao_atividade,
+        titulo_atividade,
         link_atividade
     FROM RegistroAtividade
     WHERE id_usuario = p_idUsuario
@@ -196,17 +199,6 @@ BEGIN
     ORDER BY date_atividade DESC;
 END //
 DELIMITER ;
-
-DROP PROCEDURE IF EXISTS listarHistorico;
-DELIMITER //
-CREATE PROCEDURE listarHistorico()
-BEGIN
-    SELECT * 
-    FROM RegistroAtividade 
-    ORDER BY date_atividade DESC;
-END //
-DELIMITER ;
-
 
 /* Pautas */
 

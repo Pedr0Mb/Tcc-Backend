@@ -16,8 +16,8 @@ export async function registrarVoto(req,res) {
         
     return res.status(201).json({ message: 'Voto registrado com sucesso'})
         
-  }catch(erro){
-    console.error('Erro ao registrar voto: ',erro)
+  }catch(error){
+    console.error('Erro ao registrar voto: ',error)
     return res.status(500).json({ error: 'Erro ao registrar voto'})
   }
 }

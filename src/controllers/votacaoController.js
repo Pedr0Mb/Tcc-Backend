@@ -5,9 +5,9 @@ import * as validacaoVotacao from '../validacoes/validacaoVotacao.js'
 export async function pesquisarVotacoes(req,res) {
   try{
     const data = {
-      status: req.query.status || null,
-      titulo: req.query.titulo || null,
-      tema: req.query.tema || null
+      status: req.body.status || null,
+      titulo: req.body.titulo || null,
+      tema: req.body.tema || null
     }
 
     const { status, titulo, tema } = validacaoVotacao.SchemaPesquisarVotacao.parse(data)
@@ -20,8 +20,8 @@ export async function pesquisarVotacoes(req,res) {
     
     return res.status(200).json(votacoes)
 
-  }catch(erro){
-    console.error('Erro ao pesquisar votação: ',erro)
+  }catch(error){
+    console.error('Erro ao pesquisar votação: ',error)
     return res.status(500).json({ error: 'Erro ao pesquisar votação'})
   }
 }
@@ -37,8 +37,8 @@ export async function visualizarVotacao(req, res) {
 
     return res.status(200).json({votacao,propostas});
 
-  } catch (erro) {
-    console.error('Erro ao visualizar votação: ', erro);
+  } catch (error) {
+    console.error('Erro ao visualizar votação: ', error);
     return res.status(500).json({ error: 'Erro interno ao visualizar a votação' });
   }
 }
@@ -79,7 +79,7 @@ export async function criarVotacao(req,res) {
       [titulo, tema, breveDescritivo, publicoAlvo, orcamento, dataFim, imagem, resultado, idGestor]
     )
 
-    const idVotacao = resultadoVotacao.insertId || resultadoVotacao.id_votacao;
+    const idVotacao = resultadoVotacao.insertId
 
     for (const opcao of opcoesResposta) {
       const { titulo } = validacaoVotacao.schemaOpcoesResposta.parse(opcao);
@@ -95,8 +95,8 @@ export async function criarVotacao(req,res) {
 
     await registrarAtividade('votacao_criada','Votação criada',null,idGestor)
     return res.status(201).json({ message: 'Votação criada com sucesso'})
-  }catch(erro){
-    console.error('Erro ao criar votação: ',erro)
+  }catch(error){
+    console.error('Erro ao criar votação: ',error)
     return res.status(500).json({ error: 'Erro ao criar votação'})
   }
 }
@@ -105,7 +105,7 @@ export async function alterarVotacao(req, res) {
   try {
     const idGestor = req.usuario.id;
     const data = {
-      idVotacao: Number(req.params.id),
+      idVotacao: Number(req.body.id),
       titulo: req.body.titulo,
       tema: req.body.tema,
       breveDescritivo: req.body.breveDescritivo,
@@ -150,8 +150,8 @@ export async function alterarVotacao(req, res) {
 
     await registrarAtividade('votacao_alterada', 'Votação alterada', null, idGestor);
     return res.status(200).json({ message: 'Votação atualizada com sucesso' });
-  } catch (erro) {
-    console.error('Erro ao atualizar votação: ', erro);
+  } catch (error) {
+    console.error('Erro ao atualizar votação: ', error);
     return res.status(500).json({ error: 'Erro ao atualizar votação' });
   }
 }
@@ -161,7 +161,7 @@ export async function deletarVotacao(req,res) {
     const idGestor = req.usuario.id
 
     const data = {
-      idVotacao: Number(req.params.idVotacao),
+      idVotacao: Number(req.body.idVotacao),
       motivoRemocao: req.body.motivoRemocao
     }
 
@@ -173,8 +173,8 @@ export async function deletarVotacao(req,res) {
 
     return res.status(200).json({ message: 'Votação deletada com sucesso'})
 
-  }catch(erro){
-    console.error('Erro ao deletar votação: ',erro)
+  }catch(error){
+    console.error('Erro ao deletar votação: ',error)
     return res.status(500).json({ error: 'Erro ao deletar votação'})
   }
 }

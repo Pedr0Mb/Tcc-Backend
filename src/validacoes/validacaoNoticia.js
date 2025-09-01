@@ -30,7 +30,7 @@ export const SchemaPesquisarNoticia = z.object({
 })
     
 export const SchemaVisualizarNoticia = z.object({
-    idNoticia: idSchema
+    id: idSchema
 })
 
 export const SchemaCriarNoticia = z.object({

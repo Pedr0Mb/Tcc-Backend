@@ -4,7 +4,7 @@ import * as validacaoComentario from '../validacoes/validacaoComentario.js'
 
 export async function visualizarComentario(req, res) {
     try {
-        const data = { idComentario: Number(req.query.id) };
+        const data = { idComentario: Number(req.params.id) };
 
         const { idComentario } = validacaoComentario.SchemaVisualizarComentario.parse(data);
 
@@ -16,8 +16,8 @@ export async function visualizarComentario(req, res) {
 
         return res.status(200).json(comentarios);
 
-    }catch (erro) {
-        console.error('Erro ao pesquisar comentario: ', erro);
+    }catch (error) {
+        console.error('Erro ao pesquisar comentario: ', error);
         return res.status(500).json({ error: 'Erro interno ao pesquisar comentario' });
   }
 }
@@ -33,7 +33,7 @@ export async function criarComentario(req,res) {
 
         const { texto, idPauta } = validacaoComentario.SchemaCriarComentario.parse(data);
       
-        await db.query(
+        const [comentario]  = await db.query(
             `INSERT INTO Comentario (
             texto_comentario,
             dataPublicacao_comentario,
@@ -43,12 +43,20 @@ export async function criarComentario(req,res) {
             [texto, idUsuario, idPauta]
         );
 
-        await registrarAtividade('comentario_criado', 'Comentário criado', null, idUsuario)     
+        const idComentario = comentario.insertId 
+
+        await registrarAtividade({
+            tipo: 'Comentario',
+            titulo: 'Comentário adicionado',
+            link: null,
+            idUsuario,
+            idAtividade: idComentario,
+        });
     
         return res.status(201).json({ message: 'Comentario criado com sucesso'})
     
-    }catch(erro){
-        console.error('Erro ao criar comentario: ',erro)
+    }catch(error){
+        console.error('Erro ao criar comentario: ',error)
         return res.status(500).json({ error: 'Erro interno ao criar comentario'})
     }
 }
@@ -70,12 +78,18 @@ export async function alterarComentario(req,res) {
         
         await db.query('UPDATE Comentario SET texto_comentario = ? WHERE id_comentario = ?', [texto, idComentario])
         
-        await registrarAtividade('comentario_alterado', 'Comentário alterado', null, idUsuario)
+        await registrarAtividade({
+            tipo: 'Comentario',
+            titulo: 'Comentário alterado',
+            link: null,
+            idUsuario,
+            idAtividade: idComentario,
+        });
         
         return res.status(200).json({ message: 'Comentario atualizado com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao atualizar Comentario: ',erro)
+    }catch(error){
+        console.error('Erro ao atualizar Comentario: ',error)
         return res.status(500).json({ error: 'Erro interno ao atualizar Comentario'})
     }
 }
@@ -84,11 +98,9 @@ export async function deletarComentario(req,res) {
     try{
         const idUsuario = req.usuario.id
         
-        const data = {
-            motivoRemocao: req.body.motivoRemocao,
-            idComentario: Number(req.body.idComentario)
-        };
-        const { motivoRemocao, idComentario } = validacaoComentario.SchemaDeletarComentario.parse(data);
+        const data = { idComentario: Number(req.body.idComentario)};
+
+        const { idComentario } = validacaoComentario.SchemaDeletarComentario.parse(data);
 
         const [criadorComentario] = await db.query('SELECT id_usuario FROM Comentario WHERE id_comentario = ? AND id_usuario = ?', [idComentario,idUsuario])
     
@@ -96,12 +108,18 @@ export async function deletarComentario(req,res) {
 
         await db.query('DELETE FROM Comentario WHERE id_comentario = ?', [idComentario])
    
-        await registrarAtividade('comentario_removido', motivoRemocao, null, idUsuario)
+        await registrarAtividade({
+            tipo: 'Comentario',
+            titulo: 'Comentário removido',
+            link: null,
+            idUsuario,
+            idAtividade: idComentario,
+        });
     
         return res.status(200).json({ message: 'Comentario deletado com sucesso'})
 
-    }catch(erro){
-        console.error('Erro ao deletar Comentario: ',erro)
+    }catch(error){
+        console.error('Erro ao deletar Comentario: ',error)
         return res.status(500).json({ error: 'Erro interno ao deletar Comentario'})
     }
 }
